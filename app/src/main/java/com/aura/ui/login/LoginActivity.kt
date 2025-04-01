@@ -2,8 +2,6 @@ package com.aura.ui.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
@@ -30,14 +28,21 @@ class LoginActivity : AppCompatActivity() {
         val loading = binding.loading
 
         login.setOnClickListener {
-            loading.visibility = View.VISIBLE
+            if (isGranted()) {
+                loading.visibility = View.VISIBLE
 
-            val intent = Intent(this@LoginActivity, HomeActivity::class.java)
-            startActivity(intent)
+                val intent = Intent(this@LoginActivity, HomeActivity::class.java)
+                startActivity(intent)
 
-            finish()
+                finish()
+            }
+
         }
 
+        connexionVisibility()
+    }
+
+    private fun connexionVisibility() {
         // Add listeners to update login button visibility
         binding.identifier.doAfterTextChanged { isLoginReady() }
         binding.password.doAfterTextChanged { isLoginReady() }
@@ -48,5 +53,9 @@ class LoginActivity : AppCompatActivity() {
         val isPasswordReady: Boolean = binding.password.text.toString().isNotEmpty()
         binding.login.visibility =
             if (isIdentifierReady && isPasswordReady) View.VISIBLE else View.INVISIBLE
+    }
+
+    private fun isGranted(): Boolean {
+        return true
     }
 }
