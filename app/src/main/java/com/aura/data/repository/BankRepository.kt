@@ -1,4 +1,4 @@
-package com.aura.ui.data.repository
+package com.aura.data.repository
 
 class BankRepository {
 }

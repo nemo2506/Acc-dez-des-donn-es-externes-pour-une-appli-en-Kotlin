@@ -1,4 +1,4 @@
-package com.aura.ui.data.network
+package com.aura.data.network
 
 interface ManageClient {
 }
