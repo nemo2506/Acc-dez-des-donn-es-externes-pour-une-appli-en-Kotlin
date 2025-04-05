@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.openclassrooms.stellarforecast"
+    namespace = "com.aura"
     compileSdk = 34
 
     defaultConfig {
