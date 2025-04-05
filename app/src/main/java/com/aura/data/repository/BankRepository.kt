@@ -20,7 +20,7 @@ class BankRepository @Inject constructor(
             val user = User(id, password)
             val result = dataService.fetchAccess(user)
             // Convert the response to domain model using the toDomainModel() function
-            val model = result.body()?.toDomainModel() ?: throw Exception(context.getString(R.string.login_failed))
+            val model = result.body()?.toDomainModel(context) ?: throw Exception(context.getString(R.string.login_failed))
             Result.Success(model)
         } catch (error: Exception) {
             Result.Failure(error.message)

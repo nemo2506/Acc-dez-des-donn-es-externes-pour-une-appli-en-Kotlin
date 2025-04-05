@@ -13,7 +13,7 @@
     <string name="prompt_amount">Montant</string>
     <string name="action_transfer">Faire le virement</string>
     <string name="login_success">Connexion réussi</string>
-    <string name="login_failed">Échec de connexion</string>
+    <string name="login_failed">Identifiant ou Mot de Passe Invalide</string>
     <string name="loading_failed">Échec de chargement</string>
     <string name="server_error">Problème Serveur</string>
 </resources>
