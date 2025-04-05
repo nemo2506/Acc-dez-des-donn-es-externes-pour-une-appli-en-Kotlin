@@ -1,23 +1,26 @@
 package com.aura.ui.login
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.aura.R
 import com.aura.data.repository.BankRepository
 import com.aura.data.repository.Result
-import com.aura.data.response.LoginBankResponse
 import com.aura.domain.model.LoginReportModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import retrofit2.Response
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
+
 @HiltViewModel
-class LoginActivityViewModel @Inject constructor(private val dataRepository: BankRepository) : ViewModel() {
+class LoginActivityViewModel @Inject constructor(private val dataRepository: BankRepository,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
 
     suspend fun getAuraLogin(id:String, password:String): LoginReportModel {
         return when(val result = dataRepository.fetchLoginAccess(id,password)){
             is Result.Success -> result.value
-            is Result.Failure -> LoginReportModel(false, "Erreur du serveur")
-            is Result.Loading -> LoginReportModel(false, "Erreur de chargement")
+            is Result.Failure -> LoginReportModel(false, context.getString(R.string.loading_failed))
+            is Result.Loading -> LoginReportModel(false, context.getString(R.string.server_error))
         }
     }
 }
