@@ -12,14 +12,15 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class LoginActivityViewModel @Inject constructor(private val dataRepository: BankRepository,
+class LoginActivityViewModel @Inject constructor(
+    private val dataRepository: BankRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    suspend fun getAuraLogin(id:String, password:String): LoginReportModel {
-        return when(val result = dataRepository.fetchLoginAccess(id,password)){
+    suspend fun getAuraLogin(id: String, password: String): LoginReportModel {
+        return when (val result = dataRepository.fetchLoginAccess(id, password)) {
             is Result.Success -> result.value
-            is Result.Failure -> LoginReportModel(false, context.getString(R.string.loading_failed))
+            is Result.Failure -> LoginReportModel(false, context.getString(R.string.login_failed))
             is Result.Loading -> LoginReportModel(false, context.getString(R.string.server_error))
         }
     }

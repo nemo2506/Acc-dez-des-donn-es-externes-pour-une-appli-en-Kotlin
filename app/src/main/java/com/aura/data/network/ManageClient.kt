@@ -1,5 +1,6 @@
 package com.aura.data.network
 
+import com.aura.data.response.AccountBankResponse
 import com.aura.data.response.LoginBankResponse
 import com.aura.domain.model.User
 import okhttp3.Request
@@ -15,4 +16,9 @@ interface ManageClient {
     suspend fun fetchAccess(
         @Body request: User
     ): Response<LoginBankResponse>
+
+    @GET("/accounts/{id}")
+    suspend fun fetchAccounts(
+        @Query(value = "id") id: String
+    ): Response<AccountBankResponse>
 }
