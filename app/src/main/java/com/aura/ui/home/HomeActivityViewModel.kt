@@ -47,8 +47,8 @@ class HomeActivityViewModel @Inject constructor(
 //            }
 //        }.launchIn(viewModelScope)
 //    }
-//}
-    
+}
+
 data class HomeUiState(
     val forecast: List<AccountsReportModel> = emptyList(),
     val isViewLoading: Boolean = false,
