@@ -19,4 +19,6 @@
     <string name="try_again">Try Again</string>
     <string name="balance_error">Erreur Solde</string>
     <string name="transfer_error">Erreur Transfert</string>
+    <string name="amount_required">Montant doit être saisi</string>
+    <string name="recipient_required">Destinataire doit être saisi</string>
 </resources>

@@ -1,13 +1,10 @@
 package com.aura.ui.login
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.aura.databinding.ActivityLoginBinding
 import com.aura.ui.home.HomeActivity

@@ -34,7 +34,6 @@ class HomeActivity : AppCompatActivity() {
     private val startTransferActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             //TODO
-            Toast.makeText(this, "TEST", Toast.LENGTH_SHORT).show()
         }
 
     @SuppressLint("SetTextI18n")

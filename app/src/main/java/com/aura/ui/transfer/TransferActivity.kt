@@ -30,33 +30,32 @@ class TransferActivity : AppCompatActivity() {
         binding = ActivityTransferBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val recipient = binding.recipient
-        val amount = binding.amount
         val transfer = binding.transfer
         val loading = binding.loading
 
         transfer.setOnClickListener {
             loading.visibility = View.VISIBLE
-
-            setResult(Activity.RESULT_OK)
-            finish()
-        }
-        lifecycleScope.launch {
-            if (manageTransferUI()) {
-                binding.loading.visibility = View.VISIBLE
+            lifecycleScope.launch {
+                if (manageTransferUI())  binding.loading.visibility = View.VISIBLE
             }
+            homeLoader()
         }
 
+    }
+
+    private fun homeLoader() {
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 
     private suspend fun manageTransferUI(): Boolean {
         val report: TransferReportModel
         val recipient: String? = binding.recipient.text?.toString()
         val amount: Double? = binding.amount.text?.toString()?.toDoubleOrNull()
-        if(isTransferUIReady(recipient,amount)){
-            if(recipient != null && amount != null){
+        if (isTransferUIReady(recipient, amount)) {
+            if (recipient != null && amount != null) {
                 report = viewModel.getAuraTransfer(recipient, amount)
-                if(report.done == true) return true
+                if (report.done == true) return true
                 Toast.makeText(this, report.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -64,8 +63,13 @@ class TransferActivity : AppCompatActivity() {
     }
 
     private fun isTransferUIReady(recipient: String?, amount: Double?): Boolean {
-        if(recipient == null) Toast.makeText(this, "Destinataire doit être saisi", Toast.LENGTH_SHORT).show()
-        if(amount == null) Toast.makeText(this, "Montant doit être saisi", Toast.LENGTH_SHORT).show()
+        if (recipient == null) Toast.makeText(
+            this,
+            "Destinataire doit être saisi",
+            Toast.LENGTH_SHORT
+        ).show()
+        if (amount == null) Toast.makeText(this, "Montant doit être saisi", Toast.LENGTH_SHORT)
+            .show()
         return recipient != null && amount != null
     }
 
