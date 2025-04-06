@@ -3,7 +3,7 @@ package com.aura.data.response
 import android.content.Context
 import android.util.Log
 import com.aura.R
-import com.aura.domain.model.AccountsReportModel
+import com.aura.domain.model.BalanceReportModel
 import com.aura.domain.model.LoginReportModel
 import com.aura.domain.model.TransferReportModel
 import com.squareup.moshi.Json

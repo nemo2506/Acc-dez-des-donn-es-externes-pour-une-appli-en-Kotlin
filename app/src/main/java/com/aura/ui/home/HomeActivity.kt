@@ -3,6 +3,7 @@ package com.aura.ui.home
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -34,6 +35,7 @@ class HomeActivity : AppCompatActivity() {
     private val startTransferActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             //TODO
+            Log.d("MARC", "HomeAcivity: $result")
         }
 
     @SuppressLint("SetTextI18n")

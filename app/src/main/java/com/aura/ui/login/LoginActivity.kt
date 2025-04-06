@@ -12,7 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import androidx.activity.viewModels
 import com.aura.R
-import com.aura.domain.model.AccountsReportModel
+import com.aura.domain.model.BalanceReportModel
 import com.aura.domain.model.LoginReportModel
 
 /**
@@ -70,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private suspend fun getAccount(): Boolean {
-        val report: AccountsReportModel = viewModel.getAuraAccount()
+        val report: BalanceReportModel = viewModel.getAuraBalance()
         if (report.balance == null) {
             Toast.makeText(this, report.message, Toast.LENGTH_SHORT).show()
             binding.login.text = getString(R.string.try_again)

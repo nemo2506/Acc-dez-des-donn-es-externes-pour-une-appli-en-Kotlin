@@ -1,11 +1,12 @@
 package com.aura.data.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.aura.R
 import com.aura.data.network.ManageClient
 import com.aura.data.response.AccountBankResponse
-import com.aura.domain.model.AccountsReportModel
+import com.aura.domain.model.BalanceReportModel
 import com.aura.domain.model.LoginReportModel
 import com.aura.domain.model.Transfer
 import com.aura.domain.model.TransferReportModel
@@ -37,16 +38,16 @@ class BankRepository @Inject constructor(
         }
     }
 
-    private fun List<AccountBankResponse>.toDomainModel(context: Context): AccountsReportModel {
+    private fun List<AccountBankResponse>.toDomainModel(context: Context): BalanceReportModel {
         val mainAccount = this.firstOrNull { it.main }
         return if (mainAccount != null) {
-            AccountsReportModel(mainAccount.balance, null)
+            BalanceReportModel(mainAccount.balance, null)
         } else {
-            AccountsReportModel(null, context.getString(R.string.server_error))
+            BalanceReportModel(null, context.getString(R.string.server_error))
         }
     }
 
-    suspend fun getAccounts(): Result<AccountsReportModel> {
+    suspend fun getAccounts(): Result<BalanceReportModel> {
         return try {
             Result.Loading
             val result = dataService.fetchApiAccounts(currentId)
@@ -62,8 +63,11 @@ class BankRepository @Inject constructor(
     suspend fun getTransfer(recipient: String, amount: Double): Result<TransferReportModel> {
         return try {
             Result.Loading
+            Log.d("MARC", "getTransfer 1")
             val transfer = Transfer(currentId, recipient, amount)
+            Log.d("MARC", "getTransfer 2")
             val result = dataService.fetchTransfer(transfer)
+            Log.d("MARC", "getTransfer 3: $result")
             val model = result.body()?.toDomainModel(context)
                 ?: throw Exception(context.getString(R.string.transfer_error))
             Result.Success(model)
