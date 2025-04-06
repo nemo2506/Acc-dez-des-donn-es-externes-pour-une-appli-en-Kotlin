@@ -14,6 +14,7 @@ import com.aura.ui.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import androidx.activity.viewModels
+import com.aura.domain.model.AccountsReportModel
 import com.aura.domain.model.LoginReportModel
 
 /**
@@ -28,8 +29,6 @@ class LoginActivity : AppCompatActivity() {
      * The binding for the login layout.
      */
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var loading: ActivityLoginBinding
-    lateinit var login: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,21 +48,36 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun manageIntentUI(connected: LoginReportModel) {
+    private suspend fun manageIntentUI(connected: LoginReportModel) {
         if (connected.granted) {
-            binding.loading.visibility = View.VISIBLE
-            val intent = Intent(this@LoginActivity, HomeActivity::class.java)
-            startActivity(intent)
-            finish()
+
+            if (getAccount()) {
+                binding.loading.visibility = View.VISIBLE
+                homeLoader()
+            }
+
         } else {
             binding.login.isEnabled = true
             Toast.makeText(this, connected.message, Toast.LENGTH_SHORT).show()
         }
     }
 
+    private fun homeLoader() {
+        startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+        finish()
+    }
+
     private suspend fun isConnected(id: String, password: String): LoginReportModel {
-        val response = viewModel.getAuraLogin(id, password)
-        Log.d("##### MARC #####", "isConnected: $response")
         return viewModel.getAuraLogin(id, password)
     }
+
+    private suspend fun getAccount(): Boolean {
+        val report: AccountsReportModel = viewModel.getAuraAccount()
+        if (report.balance == null) {
+            Toast.makeText(this, report.message, Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
+    }
+
 }

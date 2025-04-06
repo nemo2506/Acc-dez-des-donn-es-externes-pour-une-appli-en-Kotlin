@@ -18,8 +18,9 @@ data class LoginBankResponse(
         return LoginReportModel(granted, message)
     }
 }
+
 @JsonClass(generateAdapter = true)
-data class AccountBankResponse(
+data class AccountsBankResponse(
     @Json(name = "list")
     val accounts: List<AccountResponse>,
 ) {
@@ -32,23 +33,14 @@ data class AccountBankResponse(
         val main: Boolean,
         @Json(name = "balance")
         val balance: Double,
-    ) {
+    )
 
-        @JsonClass(generateAdapter = true)
-        data class TemperatureResponse(
-            @Json(name = "temp")
-            val temp: Double,
-        )
-    }
-
-    fun toDomainModel(context: Context): List<AccountsReportModel> {
-        return accounts.map { account ->
-
+    fun toDomainModel(context: Context): AccountsReportModel? {
+        val mainAccount = accounts.firstOrNull { it.main == true }
+        return mainAccount?.let { account ->
             AccountsReportModel(
-                id = account.id,
-                main = account.main,
                 balance = account.balance,
-                message = "TEST"
+                message = "Relevé réussi"
             )
         }
     }
