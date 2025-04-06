@@ -47,8 +47,7 @@ class HomeActivity : AppCompatActivity() {
         val balance = binding.balance
         val transfer = binding.transfer
 
-//        balance.text = "2654,54€"
-        balance.text = "%0.1f€".format(viewModel.balance.toString())
+        balance.text = "%.2f€".format(viewModel.balance)
         transfer.setOnClickListener {
             startTransferActivityForResult.launch(
                 Intent(

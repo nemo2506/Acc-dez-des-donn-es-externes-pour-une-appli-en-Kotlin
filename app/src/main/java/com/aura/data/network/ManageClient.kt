@@ -1,6 +1,6 @@
 package com.aura.data.network
 
-import com.aura.data.response.AccountsBankResponse
+import com.aura.data.response.AccountBankResponse
 import com.aura.data.response.LoginBankResponse
 import com.aura.domain.model.User
 import retrofit2.Response
@@ -18,7 +18,7 @@ interface ManageClient {
     ): Response<LoginBankResponse>
 
     @GET("/accounts/{id}")
-    suspend fun fetchAccounts(
+    suspend fun fetchApiAccounts(
         @Path("id") id: String
-    ): Response<AccountsBankResponse>
+    ): Response<List<AccountBankResponse>>
 }

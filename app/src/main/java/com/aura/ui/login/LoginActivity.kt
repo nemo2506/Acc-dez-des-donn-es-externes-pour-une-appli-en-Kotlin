@@ -75,6 +75,7 @@ class LoginActivity : AppCompatActivity() {
         val report: AccountsReportModel = viewModel.getAuraAccount()
         if (report.balance == null) {
             Toast.makeText(this, report.message, Toast.LENGTH_SHORT).show()
+            binding.login.isEnabled = true
             return false
         }
         return true
