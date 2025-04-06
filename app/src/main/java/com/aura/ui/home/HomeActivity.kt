@@ -5,17 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.aura.R
 import com.aura.databinding.ActivityHomeBinding
 import com.aura.ui.login.LoginActivity
 import com.aura.ui.transfer.TransferActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 /**
  * The home activity for the app.
@@ -35,6 +34,7 @@ class HomeActivity : AppCompatActivity() {
     private val startTransferActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             //TODO
+            Toast.makeText(this, "TEST", Toast.LENGTH_SHORT).show()
         }
 
     @SuppressLint("SetTextI18n")
@@ -50,10 +50,7 @@ class HomeActivity : AppCompatActivity() {
         balance.text = "%.2f€".format(viewModel.balance)
         transfer.setOnClickListener {
             startTransferActivityForResult.launch(
-                Intent(
-                    this@HomeActivity,
-                    TransferActivity::class.java
-                )
+                Intent(this@HomeActivity, TransferActivity::class.java)
             )
         }
     }

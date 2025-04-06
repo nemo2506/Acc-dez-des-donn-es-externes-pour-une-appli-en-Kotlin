@@ -23,7 +23,7 @@ class BankRepository @Inject constructor(
     private var _currentBalance = MutableLiveData<Double?>()
     val currentBalance: Double? get() = _currentBalance.value?.toDouble()
 
-    suspend fun fetchLoginAccess(id: String, password: String): Result<LoginReportModel> {
+    suspend fun getLogin(id: String, password: String): Result<LoginReportModel> {
         return try {
             Result.Loading
             _currentId.value = id
@@ -46,7 +46,7 @@ class BankRepository @Inject constructor(
         }
     }
 
-    suspend fun fetchAccounts(): Result<AccountsReportModel> {
+    suspend fun getAccounts(): Result<AccountsReportModel> {
         return try {
             Result.Loading
             val result = dataService.fetchApiAccounts(currentId)
@@ -59,11 +59,10 @@ class BankRepository @Inject constructor(
         }
     }
 
-    suspend fun fetchTransfer(sender: String, recipient: String, amount: Double): Result<TransferReportModel> {
+    suspend fun getTransfer(recipient: String, amount: Double): Result<TransferReportModel> {
         return try {
             Result.Loading
-//            _currentId.value = id
-            val transfer = Transfer(sender, recipient, amount)
+            val transfer = Transfer(currentId, recipient, amount)
             val result = dataService.fetchTransfer(transfer)
             val model = result.body()?.toDomainModel(context)
                 ?: throw Exception(context.getString(R.string.transfer_error))

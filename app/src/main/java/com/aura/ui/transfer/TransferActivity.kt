@@ -3,6 +3,7 @@ package com.aura.ui.transfer
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.aura.databinding.ActivityTransferBinding
 
@@ -16,6 +17,7 @@ class TransferActivity : AppCompatActivity()
    * The binding for the transfer layout.
    */
   private lateinit var binding: ActivityTransferBinding
+  private val viewModel: TransferActivityViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?)
   {

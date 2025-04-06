@@ -37,11 +37,11 @@ data class AccountBankResponse(
 @JsonClass(generateAdapter = true)
 data class TransferBankResponse(
     @Json(name = "result")
-    val result: Boolean
+    val done: Boolean
 ) {
     fun toDomainModel(context: Context): TransferReportModel {
         val message: String? =
-            if (result) null else context.getString(R.string.transfer_error)
-        return TransferReportModel(result, message)
+            if (done) null else context.getString(R.string.transfer_error)
+        return TransferReportModel(done, message)
     }
 }
