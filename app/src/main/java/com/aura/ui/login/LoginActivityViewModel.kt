@@ -19,7 +19,7 @@ class LoginActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     suspend fun getAuraLogin(id: String, password: String): LoginReportModel {
-        return when (val result = dataRepository.fetchLoginAccess(id, password)) {
+        return when (val result = dataRepository.getLogin(id, password)) {
             is Result.Failure -> LoginReportModel(false, context.getString(R.string.login_failed))
             Result.Loading -> LoginReportModel(false, context.getString(R.string.loading))
             is Result.Success -> result.value
@@ -27,7 +27,7 @@ class LoginActivityViewModel @Inject constructor(
     }
 
     suspend fun getAuraAccount(): AccountsReportModel {
-        return when (val result = dataRepository.fetchAccounts()) {
+        return when (val result = dataRepository.getAccounts()) {
             is Result.Failure -> AccountsReportModel(null, context.getString(R.string.balance_error))
             Result.Loading -> AccountsReportModel(null, context.getString(R.string.loading))
             is Result.Success -> result.value
