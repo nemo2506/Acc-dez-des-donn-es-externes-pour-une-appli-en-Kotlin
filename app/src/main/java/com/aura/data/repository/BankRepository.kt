@@ -38,7 +38,7 @@ class BankRepository @Inject constructor(
     private fun List<AccountBankResponse>.toDomainModel(context: Context): AccountsReportModel {
         val mainAccount = this.firstOrNull { it.main }
         return if (mainAccount != null) {
-            AccountsReportModel(mainAccount.balance, "Solde")
+            AccountsReportModel(mainAccount.balance, null)
         } else {
             AccountsReportModel(null, context.getString(R.string.server_error))
         }
