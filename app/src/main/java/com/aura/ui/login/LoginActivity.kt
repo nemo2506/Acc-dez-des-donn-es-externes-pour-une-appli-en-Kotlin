@@ -49,7 +49,7 @@ class LoginActivity : AppCompatActivity() {
     private suspend fun manageIntentUI(connected: LoginReportModel) {
         if (connected.granted) {
 
-            if (getAccount()) {
+            if (getBalance()) {
                 binding.loading.visibility = View.VISIBLE
                 homeLoader()
             }
@@ -69,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
         return viewModel.getAuraLogin(id, password)
     }
 
-    private suspend fun getAccount(): Boolean {
+    private suspend fun getBalance(): Boolean {
         val report: BalanceReportModel = viewModel.getAuraBalance()
         if (report.balance == null) {
             Toast.makeText(this, report.message, Toast.LENGTH_SHORT).show()

@@ -63,11 +63,8 @@ class BankRepository @Inject constructor(
     suspend fun getTransfer(recipient: String, amount: Double): Result<TransferReportModel> {
         return try {
             Result.Loading
-            Log.d("MARC", "getTransfer 1")
             val transfer = Transfer(currentId, recipient, amount)
-            Log.d("MARC", "getTransfer 2")
             val result = dataService.fetchTransfer(transfer)
-            Log.d("MARC", "getTransfer 3: $result")
             val model = result.body()?.toDomainModel(context)
                 ?: throw Exception(context.getString(R.string.transfer_error))
             Result.Success(model)

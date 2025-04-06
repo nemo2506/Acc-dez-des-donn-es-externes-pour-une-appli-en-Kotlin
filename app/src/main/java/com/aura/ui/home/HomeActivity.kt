@@ -3,10 +3,8 @@ package com.aura.ui.home
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -32,24 +30,21 @@ class HomeActivity : AppCompatActivity() {
     /**
      * A callback for the result of starting the TransferActivity.
      */
+    @SuppressLint("SetTextI18n")
     private val startTransferActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            //TODO
-            Log.d("MARC", "HomeAcivity: $result")
+            val newBalance = result.data?.getDoubleExtra("newBalance", 0.0)
+            binding.balance.text = "%.2f€".format(newBalance)
         }
 
-    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val balance = binding.balance
-        val transfer = binding.transfer
-
-        balance.text = "%.2f€".format(viewModel.balance)
-        transfer.setOnClickListener {
+        binding.balance.text = "%.2f€".format(viewModel.balance)
+        binding.transfer.setOnClickListener {
             startTransferActivityForResult.launch(
                 Intent(this@HomeActivity, TransferActivity::class.java)
             )

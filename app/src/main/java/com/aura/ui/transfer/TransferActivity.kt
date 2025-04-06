@@ -1,15 +1,14 @@
 package com.aura.ui.transfer
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import android.os.IBinder.DeathRecipient
-import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.aura.R
 import com.aura.databinding.ActivityTransferBinding
 import com.aura.domain.model.TransferReportModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +25,8 @@ class TransferActivity : AppCompatActivity() {
      */
     private lateinit var binding: ActivityTransferBinding
     private val viewModel: TransferActivityViewModel by viewModels()
+    private val subtract: (Double, Double) -> Double = { a, b -> a - b }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,34 +36,37 @@ class TransferActivity : AppCompatActivity() {
 
         val transfer = binding.transfer
         val loading = binding.loading
-
         transfer.setOnClickListener {
+            val amount = binding.amount.text?.toString()?.toDoubleOrNull()
+            val recipient: String? = binding.recipient.text?.toString()
             loading.visibility = View.VISIBLE
             lifecycleScope.launch {
-                if (manageTransferUI()){
+                if (manageTransferUI(recipient, amount)) {
                     binding.loading.visibility = View.VISIBLE
-                    homeLoader()
+                    if (amount != null) homeLoader(amount)
                 }
             }
         }
 
     }
 
-    private fun homeLoader() {
-        setResult(Activity.RESULT_OK)
+    private fun homeLoader(amount: Double) {
+        val resultIntent = Intent()
+        val newBalance = viewModel.balance?.let { subtract(it, amount) }
+        resultIntent.putExtra("newBalance", newBalance)
+        setResult(Activity.RESULT_OK, resultIntent)
         finish()
     }
 
-    private suspend fun manageTransferUI(): Boolean {
+    private suspend fun manageTransferUI(recipient: String?, amount: Double?): Boolean {
         val report: TransferReportModel
-        val recipient: String? = binding.recipient.text?.toString()
-        val amount: Double? = binding.amount.text?.toString()?.toDoubleOrNull()
         if (isTransferUIReady(recipient, amount)) {
             if (recipient != null && amount != null) {
-                Log.d("MARC", "manageTransferUI 1")
                 report = viewModel.getAuraTransfer(recipient, amount)
-                Log.d("MARC", "manageTransferUI 2: $report")
-                if (report.done == true) return true
+                if (report.done == true) {
+                    viewModel.getAuraBalance()
+                    return true
+                }
                 Toast.makeText(this, report.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -70,13 +74,10 @@ class TransferActivity : AppCompatActivity() {
     }
 
     private fun isTransferUIReady(recipient: String?, amount: Double?): Boolean {
-        if (recipient == null) Toast.makeText(
-            this,
-            "Destinataire doit être saisi",
-            Toast.LENGTH_SHORT
-        ).show()
-        if (amount == null) Toast.makeText(this, "Montant doit être saisi", Toast.LENGTH_SHORT)
-            .show()
+        if (recipient == null) Toast.makeText(this,
+            getString(R.string.recipient_required),Toast.LENGTH_SHORT).show()
+        if (amount == null) Toast.makeText(this,
+            getString(R.string.amount_required), Toast.LENGTH_SHORT).show()
         return recipient != null && amount != null
     }
 
