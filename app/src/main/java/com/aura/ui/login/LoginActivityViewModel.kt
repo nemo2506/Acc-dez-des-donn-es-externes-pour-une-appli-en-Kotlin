@@ -28,7 +28,7 @@ class LoginActivityViewModel @Inject constructor(
 
     suspend fun getAuraAccount(): AccountsReportModel {
         return when (val result = dataRepository.fetchAccounts()) {
-            is Result.Failure -> AccountsReportModel(null, context.getString(R.string.server_error))
+            is Result.Failure -> AccountsReportModel(null, context.getString(R.string.balance_error))
             Result.Loading -> AccountsReportModel(null, context.getString(R.string.loading))
             is Result.Success -> result.value
         }

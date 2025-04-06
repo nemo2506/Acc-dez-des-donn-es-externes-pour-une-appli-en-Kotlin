@@ -53,7 +53,7 @@ class BankRepository @Inject constructor(
             _currentBalance.value = model.balance
             Result.Success(model)
         } catch (error: Exception) {
-            Result.Failure(context.getString(R.string.server_error))
+            Result.Failure(error.message)
         }
     }
 }
