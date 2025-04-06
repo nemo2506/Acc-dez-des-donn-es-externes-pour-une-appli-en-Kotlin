@@ -7,6 +7,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ManageClient {
@@ -18,6 +19,6 @@ interface ManageClient {
 
     @GET("/accounts/{id}")
     suspend fun fetchAccounts(
-        @Query(value = "id") id: String
+        @Path("id") id: String
     ): Response<AccountsBankResponse>
 }
