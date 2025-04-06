@@ -31,7 +31,7 @@ class BankRepository @Inject constructor(
                 ?: throw Exception(context.getString(R.string.login_failed))
             Result.Success(model)
         } catch (error: Exception) {
-            Result.Failure(error.message)
+            Result.Failure(context.getString(R.string.server_error))
         }
     }
 
