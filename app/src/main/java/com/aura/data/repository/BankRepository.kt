@@ -20,7 +20,7 @@ class BankRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private var _currentId = MutableLiveData<String>()
-    val currentId: LiveData<String> get() = _currentId
+    private val currentId: String? get() = _currentId.value
     private var _currentBalance = MutableLiveData<Double?>()
     val currentBalance: MutableLiveData<Double?> get() = _currentBalance
 
