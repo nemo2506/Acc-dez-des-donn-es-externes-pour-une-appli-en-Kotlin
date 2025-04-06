@@ -2,6 +2,8 @@ package com.aura.data.network
 
 import com.aura.data.response.AccountBankResponse
 import com.aura.data.response.LoginBankResponse
+import com.aura.data.response.TransferBankResponse
+import com.aura.domain.model.Transfer
 import com.aura.domain.model.User
 import retrofit2.Response
 import retrofit2.http.Body
@@ -21,4 +23,10 @@ interface ManageClient {
     suspend fun fetchApiAccounts(
         @Path("id") id: String
     ): Response<List<AccountBankResponse>>
+
+
+    @POST("/transfer")
+    suspend fun fetchTransfer(
+        @Body request: Transfer
+    ): Response<TransferBankResponse>
 }

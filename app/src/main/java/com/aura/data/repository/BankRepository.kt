@@ -7,6 +7,8 @@ import com.aura.data.network.ManageClient
 import com.aura.data.response.AccountBankResponse
 import com.aura.domain.model.AccountsReportModel
 import com.aura.domain.model.LoginReportModel
+import com.aura.domain.model.Transfer
+import com.aura.domain.model.TransferReportModel
 import com.aura.domain.model.User
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -31,7 +33,7 @@ class BankRepository @Inject constructor(
                 ?: throw Exception(context.getString(R.string.login_failed))
             Result.Success(model)
         } catch (error: Exception) {
-            Result.Failure(context.getString(R.string.server_error))
+            Result.Failure(error.message)
         }
     }
 
@@ -51,6 +53,20 @@ class BankRepository @Inject constructor(
             val list = result.body() ?: throw Exception(context.getString(R.string.server_error))
             val model = list.toDomainModel(context)
             _currentBalance.value = model.balance
+            Result.Success(model)
+        } catch (error: Exception) {
+            Result.Failure(error.message)
+        }
+    }
+
+    suspend fun fetchTransfer(sender: String, recipient: String, amount: Double): Result<TransferReportModel> {
+        return try {
+            Result.Loading
+//            _currentId.value = id
+            val transfer = Transfer(sender, recipient, amount)
+            val result = dataService.fetchTransfer(transfer)
+            val model = result.body()?.toDomainModel(context)
+                ?: throw Exception(context.getString(R.string.transfer_error))
             Result.Success(model)
         } catch (error: Exception) {
             Result.Failure(error.message)

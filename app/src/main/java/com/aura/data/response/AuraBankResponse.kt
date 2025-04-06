@@ -5,6 +5,7 @@ import android.util.Log
 import com.aura.R
 import com.aura.domain.model.AccountsReportModel
 import com.aura.domain.model.LoginReportModel
+import com.aura.domain.model.TransferReportModel
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
@@ -32,3 +33,15 @@ data class AccountBankResponse(
     @Json(name = "balance")
     val balance: Double
 )
+
+@JsonClass(generateAdapter = true)
+data class TransferBankResponse(
+    @Json(name = "result")
+    val result: Boolean
+) {
+    fun toDomainModel(context: Context): TransferReportModel {
+        val message: String? =
+            if (result) null else context.getString(R.string.transfer_error)
+        return TransferReportModel(result, message)
+    }
+}
