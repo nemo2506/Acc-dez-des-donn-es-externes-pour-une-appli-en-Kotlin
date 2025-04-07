@@ -17,12 +17,12 @@
     <string name="loading">Chargement...</string>
     <string name="server_error">Problème Serveur</string>
     <string name="try_again">Try Again</string>
-    <string name="balance_error">Erreur Solde</string>
-    <string name="transfer_error">Erreur Transfert</string>
+    <string name="balance_error">Solde indisponible</string>
+    <string name="transfer_error">Transfert inaccessible</string>
     <string name="amount_required">Montant doit être saisi</string>
     <string name="recipient_required">Destinataire doit être saisi</string>
-    <string name="internet_required">Internet est requis</string>
-    <string name="server_required">Service Aura inaccessible</string>
+    <string name="internet_required">Réseau doit être activité</string>
+    <string name="server_required">Service Aura indisponible</string>
     <string name="network_error">Problème réseau</string>
     <string name="url_api">http://192.168.1.17:8080</string>
 </resources>

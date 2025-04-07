@@ -34,20 +34,26 @@ class TransferActivity : AppCompatActivity() {
         binding = ActivityTransferBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val transfer = binding.transfer
-        val loading = binding.loading
-        transfer.setOnClickListener {
+        binding.transfer.setOnClickListener {
             val amount = binding.amount.text?.toString()?.toDoubleOrNull()
             val recipient: String? = binding.recipient.text?.toString()
-            loading.visibility = View.VISIBLE
+            loaderShow()
             lifecycleScope.launch {
                 if (manageTransferUI(recipient, amount)) {
-                    binding.loading.visibility = View.VISIBLE
+                    loaderShow()
                     if (amount != null) homeLoader(amount)
                 }
             }
         }
 
+    }
+
+    private fun loaderShow() {
+        binding.loading.visibility = View.VISIBLE
+    }
+
+    private fun loaderHide() {
+        binding.loading.visibility = View.GONE
     }
 
     private fun homeLoader(amount: Double) {
@@ -60,25 +66,35 @@ class TransferActivity : AppCompatActivity() {
 
     private suspend fun manageTransferUI(recipient: String?, amount: Double?): Boolean {
         val report: TransferReportModel
-        if (isTransferUIReady(recipient, amount)) {
+        if (isDataUIReady(recipient, amount)) {
             if (recipient != null && amount != null) {
                 report = viewModel.getAuraTransfer(recipient, amount)
                 if (report.done == true) {
                     viewModel.getAuraBalance()
                     return true
                 }
-                Toast.makeText(this, report.message, Toast.LENGTH_SHORT).show()
+                report.message?.let { toastMessage(it) }
             }
         }
         return false
     }
 
-    private fun isTransferUIReady(recipient: String?, amount: Double?): Boolean {
-        if (recipient == null) Toast.makeText(this,
-            getString(R.string.recipient_required),Toast.LENGTH_SHORT).show()
-        if (amount == null) Toast.makeText(this,
-            getString(R.string.amount_required), Toast.LENGTH_SHORT).show()
+    private fun isDataUIReady(recipient: String?, amount: Double?): Boolean {
+        if (recipient == null) recipientFailedMessage()
+        if (amount == null) amountFailedMessage()
         return recipient != null && amount != null
     }
 
+    private fun toastMessage(message: String) {
+        loaderHide()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun recipientFailedMessage() {
+        toastMessage(getString(R.string.recipient_required))
+    }
+
+    private fun amountFailedMessage() {
+        toastMessage(getString(R.string.amount_required))
+    }
 }
