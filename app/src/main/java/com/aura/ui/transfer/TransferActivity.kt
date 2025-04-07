@@ -3,6 +3,7 @@ package com.aura.ui.transfer
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -25,7 +26,6 @@ class TransferActivity : AppCompatActivity() {
      */
     private lateinit var binding: ActivityTransferBinding
     private val viewModel: TransferActivityViewModel by viewModels()
-    private val subtract: (Double, Double) -> Double = { a, b -> a - b }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +57,7 @@ class TransferActivity : AppCompatActivity() {
     }
 
     private fun homeLoader(amount: Double) {
+        val subtract: (Double, Double) -> Double = { a, b -> a - b }
         val resultIntent = Intent()
         val newBalance = viewModel.balance?.let { subtract(it, amount) }
         resultIntent.putExtra("newBalance", newBalance)

@@ -3,6 +3,7 @@ package com.aura.ui.home
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.ActivityResult
@@ -34,9 +35,11 @@ class HomeActivity : AppCompatActivity() {
     private val startTransferActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             val newBalance = result.data?.getDoubleExtra("newBalance", 0.0)
-            binding.balance.text = "%.2f€".format(newBalance)
+            val balance = newBalance ?: viewModel.balance
+            binding.balance.text = "%.2f€".format(balance)
         }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
