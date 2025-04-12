@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -38,6 +39,7 @@ class LoginActivity : AppCompatActivity() {
 
         binding.login.setOnClickListener {
             binding.login.isEnabled = false
+            binding.loading.isVisible = true
             lifecycleScope.launch {
                 val id = binding.identifier.text.toString()
                 val password = binding.password.text.toString()
@@ -47,10 +49,8 @@ class LoginActivity : AppCompatActivity() {
                     if (it.logged == true) {
                         viewModel.getAuraBalance()
                         homeLoader()
-                    }
-
-                    if (it.errorMessage?.isNotBlank() == true) {
-                        toastMessage(it.errorMessage)
+                    } else {
+                        toastMessage(getString(R.string.login_failed))
                         binding.login.isEnabled = true
                         binding.login.text = getString(R.string.try_again)
                     }
