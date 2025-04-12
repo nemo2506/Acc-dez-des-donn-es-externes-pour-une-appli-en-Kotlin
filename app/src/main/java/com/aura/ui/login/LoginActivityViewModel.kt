@@ -22,8 +22,8 @@ class LoginActivityViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(QueryUiState())
+    val uiState: StateFlow<QueryUiState> = _uiState.asStateFlow()
 
     suspend fun getAuraLogin(id: String, password: String) {
 
@@ -58,32 +58,43 @@ class LoginActivityViewModel @Inject constructor(
         }
     }
 
-    suspend fun getAuraBalance(): BalanceReportModel {
-        return when (val result = dataRepository.getBalance()) {
-            is Result.Failure -> BalanceReportModel(
-                null,
-                context.getString(R.string.balance_error)
-            )
+    suspend fun getAuraBalance() {
 
-            Result.Loading -> BalanceReportModel(null, context.getString(R.string.loading))
-            is Result.Success -> result.value
+        when (val loginUpdate = dataRepository.getBalance()) {
+            is Result.Failure -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isViewLoading = false,
+                        errorMessage = loginUpdate.message
+                    )
+                }
+            }
+
+            Result.Loading -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isViewLoading = true,
+                        errorMessage = null
+                    )
+                }
+            }
+
+            is Result.Success -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        balance = loginUpdate.value.balance,
+                        isViewLoading = false,
+                        errorMessage = null
+                    )
+                }
+            }
         }
     }
 }
 
-//data class LoginUiState(
-//    val forecast: List<LoginReportModel> = emptyList(),
-//    val isViewLoading: Boolean = false,
-//    val errorMessage: String? = null
-//)
-data class LoginUiState(
-    val logged: Boolean = false,
-    val isViewLoading: Boolean = false,
-    val errorMessage: String? = null
-)
-
-data class BalanceUiState(
-    val login: List<BalanceReportModel> = emptyList(),
+data class QueryUiState(
+    val logged: Boolean? = null,
+    val balance: Double? = null,
     val isViewLoading: Boolean = false,
     val errorMessage: String? = null
 )
