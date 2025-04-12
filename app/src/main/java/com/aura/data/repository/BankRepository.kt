@@ -1,11 +1,10 @@
 package com.aura.data.repository
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.aura.R
 import com.aura.data.network.ManageClient
-import com.aura.data.response.AccountBankResponse
+import com.aura.domain.model.Account
 import com.aura.domain.model.BalanceReportModel
 import com.aura.domain.model.LoginReportModel
 import com.aura.domain.model.Transfer
@@ -19,15 +18,14 @@ class BankRepository @Inject constructor(
     private val dataService: ManageClient,
     @ApplicationContext private val context: Context
 ) {
-    private var _currentId = MutableLiveData<String>()
-    private val currentId: String get() = _currentId.value.toString()
+    private lateinit var currentId: String
     private var _currentBalance = MutableLiveData<Double?>()
     val currentBalance: Double? get() = _currentBalance.value?.toDouble()
 
     suspend fun getLogin(id: String, password: String): Result<LoginReportModel> {
         return try {
             Result.Loading
-            _currentId.value = id
+            currentId = id
             val user = User(id, password)
             val result = dataService.fetchAccess(user)
             val model = result.body()?.toDomainModel(context)
@@ -38,22 +36,16 @@ class BankRepository @Inject constructor(
         }
     }
 
-    private fun List<AccountBankResponse>.toDomainModel(context: Context): BalanceReportModel {
-        val mainAccount = this.firstOrNull { it.main }
-        return if (mainAccount != null) {
-            BalanceReportModel(mainAccount.balance, null)
-        } else {
-            BalanceReportModel(null, context.getString(R.string.server_error))
-        }
-    }
-
-    suspend fun getAccounts(): Result<BalanceReportModel> {
+    suspend fun getBalance(): Result<BalanceReportModel> {
         return try {
-            Result.Loading
-            val result = dataService.fetchApiAccounts(currentId)
+            val result = dataService.fetchBalance(currentId)
             val list = result.body() ?: throw Exception(context.getString(R.string.server_error))
-            val model = list.toDomainModel(context)
-            _currentBalance.value = model.balance
+            val accounts: List<Account> = list.map { it.toDomainModel() }
+            val mainAccount = accounts.firstOrNull { it.main }
+            val model = BalanceReportModel(mainAccount?.balance, null)
+            if (mainAccount != null) {
+                _currentBalance.value = mainAccount.balance
+            }
             Result.Success(model)
         } catch (error: Exception) {
             Result.Failure(error.message)
