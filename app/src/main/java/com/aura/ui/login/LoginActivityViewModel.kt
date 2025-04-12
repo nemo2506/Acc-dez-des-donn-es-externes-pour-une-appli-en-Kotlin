@@ -9,6 +9,10 @@ import com.aura.domain.model.BalanceReportModel
 import com.aura.domain.model.LoginReportModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 
@@ -18,19 +22,68 @@ class LoginActivityViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    suspend fun getAuraLogin(id: String, password: String): LoginReportModel {
-        return when (val result = dataRepository.getLogin(id, password)) {
-            is Result.Failure -> LoginReportModel(false, context.getString(R.string.login_failed))
-            Result.Loading -> LoginReportModel(false, context.getString(R.string.loading))
-            is Result.Success -> result.value
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+
+    suspend fun getAuraLogin(id: String, password: String) {
+
+        when (val loginUpdate = dataRepository.getLogin(id, password)) {
+            is Result.Failure -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isViewLoading = false,
+                        errorMessage = loginUpdate.message
+                    )
+                }
+            }
+
+            Result.Loading -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isViewLoading = true,
+                        errorMessage = null
+                    )
+                }
+            }
+
+            is Result.Success -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        logged = loginUpdate.value.granted,
+                        isViewLoading = false,
+                        errorMessage = null
+                    )
+                }
+            }
         }
     }
 
     suspend fun getAuraBalance(): BalanceReportModel {
-        return when (val result = dataRepository.getAccounts()) {
-            is Result.Failure -> BalanceReportModel(null, context.getString(R.string.balance_error))
+        return when (val result = dataRepository.getBalance()) {
+            is Result.Failure -> BalanceReportModel(
+                null,
+                context.getString(R.string.balance_error)
+            )
+
             Result.Loading -> BalanceReportModel(null, context.getString(R.string.loading))
             is Result.Success -> result.value
         }
     }
 }
+
+//data class LoginUiState(
+//    val forecast: List<LoginReportModel> = emptyList(),
+//    val isViewLoading: Boolean = false,
+//    val errorMessage: String? = null
+//)
+data class LoginUiState(
+    val logged: Boolean = false,
+    val isViewLoading: Boolean = false,
+    val errorMessage: String? = null
+)
+
+data class BalanceUiState(
+    val login: List<BalanceReportModel> = emptyList(),
+    val isViewLoading: Boolean = false,
+    val errorMessage: String? = null
+)

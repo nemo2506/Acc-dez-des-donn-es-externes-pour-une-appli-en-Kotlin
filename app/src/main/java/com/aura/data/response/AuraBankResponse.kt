@@ -1,8 +1,6 @@
 package com.aura.data.response
 
-import android.content.Context
 import android.util.Log
-import com.aura.R
 import com.aura.domain.model.Account
 import com.aura.domain.model.LoginReportModel
 import com.aura.domain.model.TransferReportModel
@@ -14,9 +12,9 @@ data class LoginBankResponse(
     @Json(name = "granted")
     val granted: Boolean
 ) {
-    fun toDomainModel(context: Context): LoginReportModel {
+    fun toDomainModel(): LoginReportModel {
         val message: String =
-            if (granted) "connexion réussi" else context.getString(R.string.login_failed)
+            if (granted) "connexion réussi" else ""
         return LoginReportModel(granted, message)
     }
 }
@@ -40,10 +38,7 @@ data class TransferBankResponse(
     @Json(name = "result")
     val done: Boolean
 ) {
-    fun toDomainModel(context: Context): TransferReportModel {
-
-        val message: String? =
-            if (done) null else context.getString(R.string.transfer_error)
-        return TransferReportModel(done, message)
+    fun toDomainModel(): TransferReportModel {
+        return TransferReportModel(done, null)
     }
 }

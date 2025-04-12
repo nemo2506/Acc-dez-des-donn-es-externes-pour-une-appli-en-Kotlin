@@ -1,8 +1,6 @@
 package com.aura.data.repository
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import com.aura.R
 import com.aura.data.network.ManageClient
 import com.aura.domain.model.Account
 import com.aura.domain.model.BalanceReportModel
@@ -10,13 +8,11 @@ import com.aura.domain.model.LoginReportModel
 import com.aura.domain.model.Transfer
 import com.aura.domain.model.TransferReportModel
 import com.aura.domain.model.User
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 
 class BankRepository @Inject constructor(
-    private val dataService: ManageClient,
-    @ApplicationContext private val context: Context
+    private val dataService: ManageClient
 ) {
     private lateinit var currentId: String
     private var _currentBalance = MutableLiveData<Double?>()
@@ -28,8 +24,7 @@ class BankRepository @Inject constructor(
             currentId = id
             val user = User(id, password)
             val result = dataService.fetchAccess(user)
-            val model = result.body()?.toDomainModel(context)
-                ?: throw Exception(context.getString(R.string.login_failed))
+            val model = result.body()?.toDomainModel() ?: throw Exception("Invalid data")
             Result.Success(model)
         } catch (error: Exception) {
             Result.Failure(error.message)
@@ -39,7 +34,7 @@ class BankRepository @Inject constructor(
     suspend fun getBalance(): Result<BalanceReportModel> {
         return try {
             val result = dataService.fetchBalance(currentId)
-            val list = result.body() ?: throw Exception(context.getString(R.string.server_error))
+            val list = result.body() ?: throw Exception("Invalid data")
             val accounts: List<Account> = list.map { it.toDomainModel() }
             val mainAccount = accounts.firstOrNull { it.main }
             val model = BalanceReportModel(mainAccount?.balance, null)
@@ -57,8 +52,7 @@ class BankRepository @Inject constructor(
             Result.Loading
             val transfer = Transfer(currentId, recipient, amount)
             val result = dataService.fetchTransfer(transfer)
-            val model = result.body()?.toDomainModel(context)
-                ?: throw Exception(context.getString(R.string.transfer_error))
+            val model = result.body()?.toDomainModel() ?: throw Exception("Invalid data")
             Result.Success(model)
         } catch (error: Exception) {
             Result.Failure(error.message)

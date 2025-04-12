@@ -10,7 +10,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import retrofit2.http.Query
+
 
 interface ManageClient {
 
@@ -20,7 +20,7 @@ interface ManageClient {
     ): Response<LoginBankResponse>
 
     @GET("/accounts/{id}")
-    suspend fun fetchApiAccounts(
+    suspend fun fetchBalance(
         @Path("id") id: String
     ): Response<List<AccountBankResponse>>
 
