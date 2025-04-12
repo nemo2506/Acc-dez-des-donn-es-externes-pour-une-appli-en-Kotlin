@@ -33,7 +33,7 @@ class TransferActivityViewModel @Inject constructor(
     }
 
     suspend fun getAuraBalance(): BalanceReportModel {
-        return when (val result = dataRepository.getAccounts()) {
+        return when (val result = dataRepository.getBalance()) {
             is Result.Failure -> BalanceReportModel(null, context.getString(R.string.balance_error))
             Result.Loading -> BalanceReportModel(null, context.getString(R.string.loading))
             is Result.Success -> result.value
