@@ -97,7 +97,7 @@ class TransferActivity : AppCompatActivity() {
 
     private fun dataUserUi(recipient: EditText, amount: EditText, transfer: Button) {
         transfer.isEnabled = false
-        val textWatcher = object : TextWatcher {
+        val presence = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
@@ -107,8 +107,8 @@ class TransferActivity : AppCompatActivity() {
             }
         }
 
-        recipient.addTextChangedListener(textWatcher)
-        amount.addTextChangedListener(textWatcher)
+        recipient.addTextChangedListener(presence)
+        amount.addTextChangedListener(presence)
     }
 
     private fun toastMessage(message: String) {
@@ -116,6 +116,6 @@ class TransferActivity : AppCompatActivity() {
     }
 
     private fun transferFailedMessage() {
-        toastMessage(getString(R.string.amount_required))
+        toastMessage(getString(R.string.transfer_error))
     }
 }
