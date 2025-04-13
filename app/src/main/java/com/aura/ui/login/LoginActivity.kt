@@ -48,39 +48,47 @@ class LoginActivity : AppCompatActivity() {
             login.isEnabled = false
             loading.isVisible = true
             lifecycleScope.launch {
-                val id = identifier.text.toString()
-                val passwd = password.text.toString()
-                viewModel.getAuraLogin(id, passwd)
+                viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
                 viewModel.uiState.collect {
                     loading.isVisible = it.isViewLoading
                     if (it.logged == true) {
                         viewModel.getAuraBalance()
-                        homeLoader()
+                        if (it.balance != null) {
+                            homeLoader()
+                        } else {
+                            toastMessage(getString(R.string.balance_error))
+                            loginRetryUi(login)
+                        }
+
                     } else {
                         toastMessage(getString(R.string.login_failed))
-                        login.isEnabled = true
-                        login.text = getString(R.string.try_again)
+                        loginRetryUi(login)
                     }
                 }
             }
         }
     }
 
-private fun loginUiManage(identifier: EditText, password: EditText, login: Button) {
-    login.isEnabled = false
-    val textWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        override fun afterTextChanged(s: Editable?) {
-            val isIdentifierNotEmpty = identifier.text?.isNotEmpty() == true
-            val isPasswordNotEmpty = password.text?.isNotEmpty() == true
-            login.isEnabled = isIdentifierNotEmpty && isPasswordNotEmpty
-        }
+    private fun loginRetryUi(login: Button) {
+        login.isEnabled = true
+        login.text = getString(R.string.try_again)
     }
 
-    identifier.addTextChangedListener(textWatcher)
-    password.addTextChangedListener(textWatcher)
-}
+    private fun loginUiManage(identifier: EditText, password: EditText, login: Button) {
+        login.isEnabled = false
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val isIdentifierNotEmpty = identifier.text?.isNotEmpty() == true
+                val isPasswordNotEmpty = password.text?.isNotEmpty() == true
+                login.isEnabled = isIdentifierNotEmpty && isPasswordNotEmpty
+            }
+        }
+
+        identifier.addTextChangedListener(textWatcher)
+        password.addTextChangedListener(textWatcher)
+    }
 
     private fun homeLoader() {
         startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
@@ -90,4 +98,6 @@ private fun loginUiManage(identifier: EditText, password: EditText, login: Butto
     private fun toastMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
+
+
 }
