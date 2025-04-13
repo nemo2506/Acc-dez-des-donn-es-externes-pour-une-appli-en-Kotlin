@@ -3,8 +3,12 @@ package com.aura.ui.transfer
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -33,15 +37,17 @@ class TransferActivity : AppCompatActivity() {
 
         binding = ActivityTransferBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val recipient = binding.recipient
+        val amount = binding.amount
+        val transfer = binding.transfer
+        transfertUiManage(recipient, amount, transfer)
 
         binding.transfer.setOnClickListener {
-            val amount = binding.amount.text?.toString()?.toDoubleOrNull()
-            val recipient: String? = binding.recipient.text?.toString()
             loaderShow()
             lifecycleScope.launch {
-                if (manageTransferUI(recipient, amount)) {
+                if (transferManage(recipient, amount)) {
                     loaderShow()
-                    if (amount != null) homeLoader(amount)
+                    homeLoader(amount)
                 }
             }
         }
@@ -56,34 +62,39 @@ class TransferActivity : AppCompatActivity() {
         binding.loading.visibility = View.GONE
     }
 
-    private fun homeLoader(amount: Double) {
+    private fun homeLoader(amount: EditText) {
         val subtract: (Double, Double) -> Double = { a, b -> a - b }
         val resultIntent = Intent()
-        val newBalance = viewModel.balance?.let { subtract(it, amount) }
+        val newBalance = viewModel.balance?.let { subtract(it, amount.text.toString().toDouble()) }
         resultIntent.putExtra("newBalance", newBalance)
         setResult(Activity.RESULT_OK, resultIntent)
         finish()
     }
 
-    private suspend fun manageTransferUI(recipient: String?, amount: Double?): Boolean {
-        val report: TransferReportModel
-        if (isDataUIReady(recipient, amount)) {
-            if (recipient != null && amount != null) {
-                report = viewModel.getAuraTransfer(recipient, amount)
-                if (report.done == true) {
-                    viewModel.getAuraBalance()
-                    return true
-                }
-                report.message?.let { toastMessage(it) }
-            }
+    private suspend fun transferManage(recipient: EditText, amount: EditText): Boolean {
+        val report = viewModel.getAuraTransfer(recipient.text.toString(), amount.text.toString().toDouble())
+        if (report.done == true) {
+            viewModel.getAuraBalance()
+            return true
         }
+        report.message?.let { toastMessage(it) }
         return false
     }
 
-    private fun isDataUIReady(recipient: String?, amount: Double?): Boolean {
-        if (recipient == null) recipientFailedMessage()
-        if (amount == null) amountFailedMessage()
-        return recipient != null && amount != null
+    private fun transfertUiManage(recipient: EditText, amount: EditText, transfer: Button) {
+        transfer.isEnabled = false
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val isRecipientNotEmpty = recipient.text?.isNotEmpty() == true
+                val isAmountNotEmpty = amount.text?.isNotEmpty() == true
+                transfer.isEnabled = isRecipientNotEmpty && isAmountNotEmpty
+            }
+        }
+
+        recipient.addTextChangedListener(textWatcher)
+        amount.addTextChangedListener(textWatcher)
     }
 
     private fun toastMessage(message: String) {
