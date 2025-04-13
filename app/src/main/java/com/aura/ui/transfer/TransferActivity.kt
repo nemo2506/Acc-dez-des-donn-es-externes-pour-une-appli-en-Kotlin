@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -40,26 +41,38 @@ class TransferActivity : AppCompatActivity() {
         val recipient = binding.recipient
         val amount = binding.amount
         val transfer = binding.transfer
+        val loading = binding.loading
         dataUserUi(recipient, amount, transfer)
 
         binding.transfer.setOnClickListener {
-            loaderShow()
+            loaderShow(loading)
             lifecycleScope.launch {
                 if (transferManage(recipient, amount)) {
-                    loaderShow()
                     homeLoader(amount)
+                } else {
+                    loaderHide(loading)
+                    transferShow(transfer)
+                    transferFailedMessage()
                 }
             }
         }
 
     }
 
-    private fun loaderShow() {
-        binding.loading.visibility = View.VISIBLE
+    private fun transferShow(transfer: Button) {
+        transfer.isEnabled = true
     }
 
-    private fun loaderHide() {
-        binding.loading.visibility = View.GONE
+    private fun transferHide(transfer: Button) {
+        transfer.isEnabled = false
+    }
+
+    private fun loaderShow(loading: ProgressBar) {
+        loading.visibility = View.VISIBLE
+    }
+
+    private fun loaderHide(loading: ProgressBar) {
+        loading.visibility = View.GONE
     }
 
     private fun homeLoader(amount: EditText) {
@@ -72,7 +85,8 @@ class TransferActivity : AppCompatActivity() {
     }
 
     private suspend fun transferManage(recipient: EditText, amount: EditText): Boolean {
-        val report = viewModel.getAuraTransfer(recipient.text.toString(), amount.text.toString().toDouble())
+        val report =
+            viewModel.getAuraTransfer(recipient.text.toString(), amount.text.toString().toDouble())
         if (report.done == true) {
             viewModel.getAuraBalance()
             return true
@@ -98,15 +112,10 @@ class TransferActivity : AppCompatActivity() {
     }
 
     private fun toastMessage(message: String) {
-        loaderHide()
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun recipientFailedMessage() {
-        toastMessage(getString(R.string.recipient_required))
-    }
-
-    private fun amountFailedMessage() {
+    private fun transferFailedMessage() {
         toastMessage(getString(R.string.amount_required))
     }
 }

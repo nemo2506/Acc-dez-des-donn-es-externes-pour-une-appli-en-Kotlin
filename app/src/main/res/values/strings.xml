@@ -17,7 +17,7 @@
     <string name="loading">Chargement...</string>
     <string name="try_again">Try Again</string>
     <string name="balance_error">Solde indisponible</string>
-    <string name="transfer_error">Transfert inaccessible</string>
+    <string name="transfer_error">Transfert impossible</string>
     <string name="amount_required">Montant doit être saisi</string>
     <string name="recipient_required">Destinataire doit être saisi</string>
     <string name="server_required">Service Aura indisponible</string>
