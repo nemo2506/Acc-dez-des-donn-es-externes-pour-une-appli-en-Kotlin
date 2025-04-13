@@ -40,7 +40,7 @@ class TransferActivity : AppCompatActivity() {
         val recipient = binding.recipient
         val amount = binding.amount
         val transfer = binding.transfer
-        transfertUiManage(recipient, amount, transfer)
+        dataUserUi(recipient, amount, transfer)
 
         binding.transfer.setOnClickListener {
             loaderShow()
@@ -81,7 +81,7 @@ class TransferActivity : AppCompatActivity() {
         return false
     }
 
-    private fun transfertUiManage(recipient: EditText, amount: EditText, transfer: Button) {
+    private fun dataUserUi(recipient: EditText, amount: EditText, transfer: Button) {
         transfer.isEnabled = false
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
