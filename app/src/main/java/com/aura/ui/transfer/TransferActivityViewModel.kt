@@ -1,7 +1,6 @@
 package com.aura.ui.transfer
 
 import androidx.lifecycle.ViewModel
-import com.aura.R
 import com.aura.data.repository.BankRepository
 import com.aura.domain.model.TransferReportModel
 import com.aura.data.repository.Result

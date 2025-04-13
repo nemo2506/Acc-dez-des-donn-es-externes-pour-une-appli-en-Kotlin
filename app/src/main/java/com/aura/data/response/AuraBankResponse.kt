@@ -1,6 +1,5 @@
 package com.aura.data.response
 
-import android.util.Log
 import com.aura.domain.model.Account
 import com.aura.domain.model.LoginReportModel
 import com.aura.domain.model.TransferReportModel
