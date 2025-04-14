@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.aura.R
 import com.aura.databinding.ActivityTransferBinding
@@ -36,21 +37,36 @@ class TransferActivity : AppCompatActivity() {
 
         binding = ActivityTransferBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         val recipient = binding.recipient
         val amount = binding.amount
         val transfer = binding.transfer
         val loading = binding.loading
+
         dataUserUi(recipient, amount, transfer)
 
         binding.transfer.setOnClickListener {
             loaderShow(loading)
             lifecycleScope.launch {
-                if (transferManage(recipient, amount)) {
-                    homeLoader(amount)
-                } else {
-                    loaderHide(loading)
-                    transferShow(transfer)
-                    transferFailedMessage()
+                viewModel.uiState.collect {
+                    loaderShow(loading)
+                    transferHide(transfer)
+                    viewModel.getAuraTransfer(
+                        recipient.text.toString(),
+                        amount.text.toString().toDouble()
+                    )
+                    if (it.transferred == true) {
+                        loaderHide(loading)
+                        toastMessage(getString(R.string.transfer_success))
+                        homeLoader(amount)
+                    }
+                    if (it.transferred == false) {
+                        loaderHide(loading)
+                        transferShow(transfer)
+                        toastMessage(getString(R.string.transfer_failed))
+                    }
+
+                    if (it.errorMessage?.isNotBlank() == true) toastMessage(it.errorMessage)
                 }
             }
         }
@@ -82,17 +98,6 @@ class TransferActivity : AppCompatActivity() {
         finish()
     }
 
-    private suspend fun transferManage(recipient: EditText, amount: EditText): Boolean {
-        val report =
-            viewModel.getAuraTransfer(recipient.text.toString(), amount.text.toString().toDouble())
-        if (report.done == true) {
-            viewModel.getAuraBalance()
-            return true
-        }
-        report.message?.let { toastMessage(it) }
-        return false
-    }
-
     private fun dataUserUi(recipient: EditText, amount: EditText, transfer: Button) {
         transfer.isEnabled = false
         val presence = object : TextWatcher {
@@ -114,6 +119,6 @@ class TransferActivity : AppCompatActivity() {
     }
 
     private fun transferFailedMessage() {
-        toastMessage(getString(R.string.transfer_error))
+        toastMessage(getString(R.string.transfer_failed))
     }
 }

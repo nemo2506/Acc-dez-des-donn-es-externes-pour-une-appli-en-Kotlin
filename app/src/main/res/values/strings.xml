@@ -18,6 +18,7 @@
     <string name="try_again">Try Again</string>
     <string name="balance_success">Solde disponible</string>
     <string name="balance_failed">Solde indisponible</string>
+    <string name="transfer_success">Transfert effectué</string>
     <string name="transfer_failed">Transfert indisponible</string>
     <string name="amount_required">Montant doit être saisi</string>
     <string name="recipient_required">Destinataire doit être saisi</string>
