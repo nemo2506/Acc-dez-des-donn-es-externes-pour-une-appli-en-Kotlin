@@ -49,24 +49,29 @@ class LoginActivity : AppCompatActivity() {
             login.isEnabled = false
             loading.isVisible = true
             lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.uiState.collect {
-                        viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
+                viewModel.uiState.collect {
+                    viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
+                    loading.isVisible = it.isViewLoading
+                    if (it.logged == true) {
+                        viewModel.getAuraBalance()
                         loading.isVisible = it.isViewLoading
-                        if (it.logged == true) {
-                            viewModel.getAuraBalance()
-                            loading.isVisible = it.isViewLoading
-                            if (it.balanceReady == true) {
-                                homeLoader()
-                            } else {
-                                toastMessage(getString(R.string.balance_error))
-                                loginRetryUi(login)
-                            }
-                        } else {
-                            toastMessage(getString(R.string.login_failed))
-                            loginRetryUi(login)
+                        toastMessage(getString(R.string.login_success))
+
+                        if (it.balanceReady == true) {
+                            homeLoader()
+                            toastMessage(getString(R.string.balance_success))
                         }
+                        if (it.balanceReady == false) {
+                            loginRetryUi(login)
+                            toastMessage(getString(R.string.balance_failed))
+                        }
+
+                    } else if (it.logged == false) {
+                        loginRetryUi(login)
+                        toastMessage(getString(R.string.login_failed))
                     }
+
+                    if (it.errorMessage?.isNotBlank() == true) toastMessage(it.errorMessage)
                 }
             }
         }

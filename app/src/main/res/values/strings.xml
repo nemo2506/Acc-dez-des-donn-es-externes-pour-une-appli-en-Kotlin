@@ -16,8 +16,9 @@
     <string name="login_failed">Identifiant ou Mot de Passe Invalide</string>
     <string name="loading">Chargement...</string>
     <string name="try_again">Try Again</string>
-    <string name="balance_error">Solde indisponible</string>
-    <string name="transfer_error">Transfert indisponible</string>
+    <string name="balance_success">Solde disponible</string>
+    <string name="balance_failed">Solde indisponible</string>
+    <string name="transfer_failed">Transfert indisponible</string>
     <string name="amount_required">Montant doit être saisi</string>
     <string name="recipient_required">Destinataire doit être saisi</string>
     <string name="server_required">Service Aura indisponible</string>
