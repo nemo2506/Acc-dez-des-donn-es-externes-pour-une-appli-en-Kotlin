@@ -49,12 +49,11 @@ class LoginActivity : AppCompatActivity() {
             login.isEnabled = false
             loading.isVisible = true
             lifecycleScope.launch {
+                viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
+                viewModel.getAuraBalance()
                 viewModel.uiState.collect {
-                    viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
                     loading.isVisible = it.isViewLoading
                     if (it.logged == true) {
-                        viewModel.getAuraBalance()
-                        loading.isVisible = it.isViewLoading
                         toastMessage(getString(R.string.login_success))
 
                         if (it.balanceReady == true) {
