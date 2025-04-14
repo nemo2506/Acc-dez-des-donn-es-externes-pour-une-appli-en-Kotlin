@@ -48,19 +48,32 @@ class TransferActivity : AppCompatActivity() {
 
         binding.transfer.setOnClickListener {
             lifecycleScope.launch {
+
+                viewModel.getAuraTransfer(
+                    recipient.text.toString(),
+                    amount.text.toString().toDouble()
+                )
+                viewModel.getAuraBalance()
+
                 viewModel.uiState.collect {
                     loading.isVisible = it.isViewLoading
                     transfer.isEnabled = !it.isViewLoading
-                    viewModel.getAuraTransfer(
-                        recipient.text.toString(),
-                        amount.text.toString().toDouble()
-                    )
+
                     if (it.transferred == true) {
                         toastMessage(getString(R.string.transfer_success))
-                        homeLoader(amount)
                     }
+
                     if (it.transferred == false) {
                         toastMessage(getString(R.string.transfer_failed))
+                    }
+
+                    if (it.balanceReady == true) {
+                        it.newBalance?.let { it1 -> homeLoader(it1) }
+                        toastMessage(getString(R.string.balance_success))
+                    }
+
+                    if (it.balanceReady == false) {
+                        toastMessage(getString(R.string.balance_failed))
                     }
 
                     if (it.errorMessage?.isNotBlank() == true) toastMessage(it.errorMessage)
@@ -70,11 +83,9 @@ class TransferActivity : AppCompatActivity() {
 
     }
 
-    private fun homeLoader(amount: EditText) {
-        val subtract: (Double, Double) -> Double = { a, b -> a - b }
+    private fun homeLoader(balance: Double) {
         val resultIntent = Intent()
-        val newBalance = viewModel.balance?.let { subtract(it, amount.text.toString().toDouble()) }
-        resultIntent.putExtra("newBalance", newBalance)
+        resultIntent.putExtra("newBalance", balance)
         setResult(Activity.RESULT_OK, resultIntent)
         finish()
     }

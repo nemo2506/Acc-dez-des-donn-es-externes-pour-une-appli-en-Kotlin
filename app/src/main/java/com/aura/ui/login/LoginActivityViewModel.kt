@@ -59,7 +59,7 @@ class LoginActivityViewModel @Inject constructor(
             is Result.Failure -> {
                 _uiState.update { currentState ->
                     currentState.copy(
-                        logged = false,
+                        balanceReady = false,
                         isViewLoading = false,
                         errorMessage = balanceUpdate.message
                     )

@@ -2,9 +2,7 @@ package com.aura.ui.transfer
 
 import androidx.lifecycle.ViewModel
 import com.aura.data.repository.BankRepository
-import com.aura.domain.model.TransferReportModel
 import com.aura.data.repository.Result
-import com.aura.domain.model.BalanceReportModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +16,6 @@ class TransferActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository
 ) : ViewModel() {
 
-    val balance = dataRepository.currentBalance
     private val _uiState = MutableStateFlow(TransferUiState())
     val uiState: StateFlow<TransferUiState> = _uiState.asStateFlow()
 
@@ -55,10 +52,47 @@ class TransferActivityViewModel @Inject constructor(
             }
         }
     }
+
+    suspend fun getAuraBalance() {
+
+        when (val balanceUpdate = dataRepository.getBalance()) {
+            is Result.Failure -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        balanceReady = false,
+                        isViewLoading = false,
+                        errorMessage = balanceUpdate.message
+                    )
+                }
+            }
+
+            Result.Loading -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isViewLoading = true,
+                        errorMessage = null
+                    )
+                }
+            }
+
+            is Result.Success -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        balanceReady = balanceUpdate.value.balance != null,
+                        newBalance = balanceUpdate.value.balance,
+                        isViewLoading = false,
+                        errorMessage = null
+                    )
+                }
+            }
+        }
+    }
 }
 
 data class TransferUiState(
     val transferred: Boolean? = null,
+    val balanceReady: Boolean? = null,
+    val newBalance: Double? = null,
     val isViewLoading: Boolean = false,
     val errorMessage: String? = null
 )
