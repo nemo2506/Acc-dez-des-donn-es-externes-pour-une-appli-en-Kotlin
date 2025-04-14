@@ -54,12 +54,12 @@ class LoginActivityViewModel @Inject constructor(
 
     suspend fun getAuraBalance() {
 
-        when (val loginUpdate = dataRepository.getBalance()) {
+        when (val balanceUpdate = dataRepository.getBalance()) {
             is Result.Failure -> {
                 _uiState.update { currentState ->
                     currentState.copy(
                         isViewLoading = false,
-                        errorMessage = loginUpdate.message
+                        errorMessage = balanceUpdate.message
                     )
                 }
             }
@@ -76,7 +76,7 @@ class LoginActivityViewModel @Inject constructor(
             is Result.Success -> {
                 _uiState.update { currentState ->
                     currentState.copy(
-                        balance = loginUpdate.value.balance,
+                        balanceReady = true,
                         isViewLoading = false,
                         errorMessage = null
                     )
@@ -88,7 +88,7 @@ class LoginActivityViewModel @Inject constructor(
 
 data class QueryUiState(
     val logged: Boolean? = null,
-    val balance: Double? = null,
+    val balanceReady: Boolean? = null,
     val isViewLoading: Boolean = false,
     val errorMessage: String? = null
 )

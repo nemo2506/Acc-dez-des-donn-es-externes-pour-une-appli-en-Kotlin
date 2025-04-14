@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.aura.R
 
 /**
@@ -47,21 +49,23 @@ class LoginActivity : AppCompatActivity() {
             login.isEnabled = false
             loading.isVisible = true
             lifecycleScope.launch {
-                viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
-                viewModel.uiState.collect {
-                    loading.isVisible = it.isViewLoading
-                    if (it.logged == true) {
-                        viewModel.getAuraBalance()
-                        if (it.balance != null) {
-                            homeLoader()
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.uiState.collect {
+                        viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
+                        loading.isVisible = it.isViewLoading
+                        if (it.logged == true) {
+                            viewModel.getAuraBalance()
+                            loading.isVisible = it.isViewLoading
+                            if (it.balanceReady == true) {
+                                homeLoader()
+                            } else {
+                                toastMessage(getString(R.string.balance_error))
+                                loginRetryUi(login)
+                            }
                         } else {
-                            toastMessage(getString(R.string.balance_error))
+                            toastMessage(getString(R.string.login_failed))
                             loginRetryUi(login)
                         }
-
-                    } else {
-                        toastMessage(getString(R.string.login_failed))
-                        loginRetryUi(login)
                     }
                 }
             }
@@ -97,6 +101,5 @@ class LoginActivity : AppCompatActivity() {
     private fun toastMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
-
 
 }
