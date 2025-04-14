@@ -17,8 +17,6 @@ import kotlinx.coroutines.launch
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.aura.R
 
 /**
@@ -46,11 +44,15 @@ class LoginActivity : AppCompatActivity() {
         val loading = binding.loading
         loginUiManage(identifier, password, login)
         login.setOnClickListener {
+
             login.isEnabled = false
             loading.isVisible = true
+
             lifecycleScope.launch {
+
                 viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
                 viewModel.getAuraBalance()
+
                 viewModel.uiState.collect {
                     loading.isVisible = it.isViewLoading
                     if (it.logged == true) {
