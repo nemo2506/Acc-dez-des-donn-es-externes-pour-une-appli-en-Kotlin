@@ -47,7 +47,6 @@ class TransferActivity : AppCompatActivity() {
         dataUserUi(recipient, amount, transfer)
 
         binding.transfer.setOnClickListener {
-            loaderShow(loading)
             lifecycleScope.launch {
                 viewModel.uiState.collect {
                     loading.isVisible = it.isViewLoading
@@ -69,18 +68,6 @@ class TransferActivity : AppCompatActivity() {
             }
         }
 
-    }
-
-    private fun transferHide(transfer: Button) {
-        transfer.isEnabled = false
-    }
-
-    private fun loaderShow(loading: ProgressBar) {
-        loading.visibility = View.VISIBLE
-    }
-
-    private fun loaderHide(loading: ProgressBar) {
-        loading.visibility = View.GONE
     }
 
     private fun homeLoader(amount: EditText) {
@@ -110,9 +97,5 @@ class TransferActivity : AppCompatActivity() {
 
     private fun toastMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun transferFailedMessage() {
-        toastMessage(getString(R.string.transfer_failed))
     }
 }
