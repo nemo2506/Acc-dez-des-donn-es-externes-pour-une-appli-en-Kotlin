@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.aura.R
@@ -49,20 +50,17 @@ class TransferActivity : AppCompatActivity() {
             loaderShow(loading)
             lifecycleScope.launch {
                 viewModel.uiState.collect {
-                    loaderShow(loading)
-                    transferHide(transfer)
+                    loading.isVisible = it.isViewLoading
+                    transfer.isEnabled = !it.isViewLoading
                     viewModel.getAuraTransfer(
                         recipient.text.toString(),
                         amount.text.toString().toDouble()
                     )
                     if (it.transferred == true) {
-                        loaderHide(loading)
                         toastMessage(getString(R.string.transfer_success))
                         homeLoader(amount)
                     }
                     if (it.transferred == false) {
-                        loaderHide(loading)
-                        transferShow(transfer)
                         toastMessage(getString(R.string.transfer_failed))
                     }
 
@@ -71,10 +69,6 @@ class TransferActivity : AppCompatActivity() {
             }
         }
 
-    }
-
-    private fun transferShow(transfer: Button) {
-        transfer.isEnabled = true
     }
 
     private fun transferHide(transfer: Button) {
