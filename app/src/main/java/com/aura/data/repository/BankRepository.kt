@@ -15,8 +15,6 @@ class BankRepository @Inject constructor(
     private val dataService: ManageClient
 ) {
     private lateinit var currentId: String
-    private var _currentBalance = MutableLiveData<Double?>()
-    val currentBalance: Double? get() = _currentBalance.value?.toDouble()
 
     suspend fun getLogin(id: String, password: String): Result<LoginReportModel> {
         return try {
@@ -38,7 +36,6 @@ class BankRepository @Inject constructor(
             val accounts: List<Account> = list.map { it.toDomainModel() }
             val mainAccount = accounts.firstOrNull { it.main }
             val model = BalanceReportModel(mainAccount?.balance, null)
-            if (mainAccount != null) _currentBalance.value = mainAccount.balance
             Result.Success(model)
         } catch (error: Exception) {
             Result.Failure(error.message)
