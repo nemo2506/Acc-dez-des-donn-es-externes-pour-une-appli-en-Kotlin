@@ -44,12 +44,8 @@ class LoginActivity : AppCompatActivity() {
         val loading = binding.loading
         loginUiManage(identifier, password, login)
 
-
-
         login.setOnClickListener {
-            lifecycleScope.launch {
-                viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
-            }
+            viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
         }
 
         lifecycleScope.launch {
@@ -60,7 +56,7 @@ class LoginActivity : AppCompatActivity() {
                 login.isEnabled = it.logged == true
 
                 if (it.logged == true) {
-                    homeLoader()
+                    homeLoader(identifier)
                     toastMessage(getString(R.string.login_success))
                 } else if (it.logged == false)
                     toastMessage(getString(R.string.login_failed))
@@ -81,13 +77,14 @@ class LoginActivity : AppCompatActivity() {
                 login.isEnabled = isIdentifierNotEmpty && isPasswordNotEmpty
             }
         }
-
         identifier.addTextChangedListener(textWatcher)
         password.addTextChangedListener(textWatcher)
     }
 
-    private fun homeLoader() {
-        startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+    private fun homeLoader(id: EditText) {
+        startActivity(Intent(this, HomeActivity::class.java).apply {
+            putExtra("currentId", id.text.toString())
+        })
         finish()
     }
 

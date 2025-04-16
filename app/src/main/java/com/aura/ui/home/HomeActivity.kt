@@ -42,7 +42,7 @@ class HomeActivity : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val data: Intent? = result.data
                 currentId = data?.getStringExtra("identifier").toString()
-                Log.d("RESULT", "Received identifier: $currentId")
+                Log.d("HomeActivity RESULT", "Received identifier: $currentId")
             }
         }
 
@@ -55,6 +55,7 @@ class HomeActivity : AppCompatActivity() {
 
         val balance = binding.balance
         val loading = binding.loading
+        val transfer = binding.transfer
 
         lifecycleScope.launch {
             viewModel.getAuraBalance(currentId)
@@ -72,9 +73,10 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        binding.transfer.setOnClickListener {
+        transfer.setOnClickListener {
             startTransferActivityForResult.launch(
-                Intent(this@HomeActivity, TransferActivity::class.java)
+                Intent(this, TransferActivity::class.java)
+                    .putExtra("currentId", currentId)
             )
         }
     }

@@ -19,9 +19,9 @@ class TransferActivityViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TransferUiState())
     val uiState: StateFlow<TransferUiState> = _uiState.asStateFlow()
 
-    suspend fun getAuraTransfer(recipient: String, amount: Double) {
+    suspend fun getAuraTransfer(currentId: String, recipient: String, amount: Double) {
 
-        when (val transferUpdate = dataRepository.getTransfer(recipient, amount)) {
+        when (val transferUpdate = dataRepository.getTransfer(currentId, recipient, amount)) {
             is Result.Failure -> {
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -53,9 +53,9 @@ class TransferActivityViewModel @Inject constructor(
         }
     }
 
-    suspend fun getAuraBalance() {
+    suspend fun getAuraBalance(currentId: String) {
 
-        when (val balanceUpdate = dataRepository.getBalance()) {
+        when (val balanceUpdate = dataRepository.getBalance(currentId)) {
             is Result.Failure -> {
                 _uiState.update { currentState ->
                     currentState.copy(

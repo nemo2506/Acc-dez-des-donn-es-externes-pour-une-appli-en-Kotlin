@@ -5,15 +5,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.aura.R
 import com.aura.databinding.ActivityTransferBinding
+import com.aura.ui.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -28,6 +32,16 @@ class TransferActivity : AppCompatActivity() {
      */
     private lateinit var binding: ActivityTransferBinding
     private val viewModel: TransferActivityViewModel by viewModels()
+    private lateinit var currentId: String
+
+    private val startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                val userId = data?.getStringExtra("user_id")
+                Log.d("TransferActivity RESULT", "Received user_id: $userId")
+            }
+        }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,10 +61,11 @@ class TransferActivity : AppCompatActivity() {
             lifecycleScope.launch {
 
                 viewModel.getAuraTransfer(
+                    currentId,
                     recipient.text.toString(),
                     amount.text.toString().toDouble()
                 )
-                viewModel.getAuraBalance()
+                viewModel.getAuraBalance(currentId)
 
                 viewModel.uiState.collect {
                     loading.isVisible = it.isViewLoading
@@ -63,7 +78,7 @@ class TransferActivity : AppCompatActivity() {
                         toastMessage(getString(R.string.transfer_failed))
 
                     if (it.balanceReady == true) {
-                        it.newBalance?.let { it1 -> homeLoader(it1) }
+                        homeLoader()
                         toastMessage(getString(R.string.balance_success))
                     }
 
@@ -78,10 +93,8 @@ class TransferActivity : AppCompatActivity() {
 
     }
 
-    private fun homeLoader(balance: Double) {
-        val resultIntent = Intent()
-        resultIntent.putExtra("newBalance", balance)
-        setResult(Activity.RESULT_OK, resultIntent)
+    private fun homeLoader() {
+        startActivity(Intent(this, HomeActivity::class.java))
         finish()
     }
 
