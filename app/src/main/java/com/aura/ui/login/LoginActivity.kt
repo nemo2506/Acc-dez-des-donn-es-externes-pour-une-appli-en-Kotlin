@@ -62,17 +62,13 @@ class LoginActivity : AppCompatActivity() {
                     homeLoader()
                     toastMessage(getString(R.string.login_success))
                 } else if (it.logged == false) {
-                    loginRetryUi(login)
+                    login.isEnabled = it.logged
                     toastMessage(getString(R.string.login_failed))
                 }
 
                 if (it.errorMessage?.isNotBlank() == true) toastMessage(it.errorMessage)
             }
         }
-    }
-
-    private fun loginRetryUi(login: Button) {
-        login.isEnabled = true
     }
 
     private fun loginUiManage(identifier: EditText, password: EditText, login: Button) {
