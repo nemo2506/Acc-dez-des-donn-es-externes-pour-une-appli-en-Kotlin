@@ -54,14 +54,18 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState.collect {
 
-                loading.isVisible = it.isViewLoading
-                login.isEnabled = it.logged == false || it.isLoginReady == true
+                loading.isVisible = it.isViewLoading == true
+                login.isEnabled = it.logged == false || it.isDataReady == true
 
                 if (it.logged == true) {
                     homeLoader(identifier)
                     toastMessage(getString(R.string.login_success))
-                } else if (it.logged == false)
+                }
+
+                if (it.logged == false) {
+                    viewModel.reInit()
                     toastMessage(getString(R.string.login_failed))
+                }
 
                 if (it.errorMessage?.isNotBlank() == true) toastMessage(it.errorMessage)
             }

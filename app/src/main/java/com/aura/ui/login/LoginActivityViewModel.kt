@@ -26,7 +26,7 @@ class LoginActivityViewModel @Inject constructor(
     fun loginManage(identifier: Boolean, password: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
-                isLoginReady = identifier && password
+                isDataReady = identifier && password
             )
         }
     }
@@ -35,9 +35,10 @@ class LoginActivityViewModel @Inject constructor(
 
         viewModelScope.launch {
 
+            // FORCE 1 sec to TEST
             _uiState.update { currentState ->
                 currentState.copy(
-                    isLoginReady = false,
+                    isDataReady = false,
                     isViewLoading = true,
                     errorMessage = null
                 )
@@ -52,7 +53,7 @@ class LoginActivityViewModel @Inject constructor(
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isLoginReady = false,
+                            isDataReady = false,
                             logged = false,
                             isViewLoading = false,
                             errorMessage = loginUpdate.message
@@ -63,7 +64,7 @@ class LoginActivityViewModel @Inject constructor(
                 Result.Loading -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isLoginReady = false,
+                            isDataReady = false,
                             isViewLoading = true,
                             errorMessage = null
                         )
@@ -73,7 +74,7 @@ class LoginActivityViewModel @Inject constructor(
                 is Result.Success -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isLoginReady = false,
+                            isDataReady = false,
                             logged = loginUpdate.value.granted,
                             isViewLoading = false,
                             errorMessage = null
@@ -84,11 +85,20 @@ class LoginActivityViewModel @Inject constructor(
 
         }
     }
+
+    fun reInit() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isDataReady = null,
+                logged = null
+            )
+        }
+    }
 }
 
 data class QueryUiState(
-    val isLoginReady: Boolean = false,
+    val isDataReady: Boolean? = null,
     val logged: Boolean? = null,
-    val isViewLoading: Boolean = false,
+    val isViewLoading: Boolean? = null,
     val errorMessage: String? = null
 )

@@ -1,5 +1,6 @@
 package com.aura.ui.transfer
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aura.data.repository.BankRepository
@@ -22,10 +23,10 @@ class TransferActivityViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TransferUiState())
     val uiState: StateFlow<TransferUiState> = _uiState.asStateFlow()
 
-    fun transferManage(isRecipient: Boolean, isAmout: Boolean) {
+    fun transferManage(isRecipient: Boolean, isAmount: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
-                isTransferReady = isRecipient && isAmout
+                isDataReady = isRecipient && isAmount
             )
         }
     }
@@ -34,6 +35,7 @@ class TransferActivityViewModel @Inject constructor(
 
         viewModelScope.launch {
 
+            // FORCE 1 sec to TEST
             _uiState.update { currentState ->
                 currentState.copy(
                     isViewLoading = true,
@@ -50,7 +52,9 @@ class TransferActivityViewModel @Inject constructor(
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            errorMessage = transferUpdate.message
+                            isViewLoading = false,
+                            errorMessage = transferUpdate.message,
+                            transferred = false
                         )
                     }
                 }
@@ -58,7 +62,8 @@ class TransferActivityViewModel @Inject constructor(
                 Result.Loading -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isViewLoading = true
+                            isViewLoading = true,
+                            transferred = null
                         )
                     }
                 }
@@ -66,6 +71,7 @@ class TransferActivityViewModel @Inject constructor(
                 is Result.Success -> {
                     _uiState.update { currentState ->
                         currentState.copy(
+                            isViewLoading = false,
                             transferred = transferUpdate.value.done
                         )
                     }
@@ -73,11 +79,19 @@ class TransferActivityViewModel @Inject constructor(
             }
         }
     }
+
+    fun reInit() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                transferred = null
+            )
+        }
+    }
 }
 
 data class TransferUiState(
-    val isTransferReady: Boolean = false,
+    val isDataReady: Boolean? = null,
     val transferred: Boolean? = null,
-    val isViewLoading: Boolean = false,
+    val isViewLoading: Boolean? = null,
     val errorMessage: String? = null
 )

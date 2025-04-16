@@ -67,16 +67,19 @@ class HomeActivity : AppCompatActivity() {
 
             viewModel.uiState.collect {
 
-                loading.isVisible = it.isViewLoading
-                retry.isVisible = it.balanceReady == false
+                loading.isVisible = it.isViewLoading == true
+                retry.isVisible = it.isBalanceReady == false
 
-                if (it.balanceReady == true) {
+                if (it.isBalanceReady == true) {
                     balance.text = "%.2f€".format(it.balance)
                     toastMessage(getString(R.string.balance_success))
                 }
 
-                if (it.balanceReady == false)
+                if (it.isBalanceReady == false){
+                    viewModel.reInit()
                     toastMessage(getString(R.string.balance_failed))
+                }
+
             }
         }
 

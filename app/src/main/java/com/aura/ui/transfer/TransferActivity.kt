@@ -62,17 +62,18 @@ class TransferActivity : AppCompatActivity() {
         lifecycleScope.launch {
 
             viewModel.uiState.collect {
-                loading.isVisible = it.isViewLoading
-                transfer.isEnabled = it.transferred == true || it.isTransferReady == true
+                loading.isVisible = it.isViewLoading == true
+                transfer.isEnabled = it.transferred == true || it.isDataReady == true
 
                 if (it.transferred == true){
                     homeLoader()
                     toastMessage(getString(R.string.transfer_success))
                 }
 
-
-                if (it.transferred == false)
+                if (it.transferred == false){
+                    viewModel.reInit()
                     toastMessage(getString(R.string.transfer_failed))
+                }
 
                 if (it.errorMessage?.isNotBlank() == true)
                     toastMessage(it.errorMessage)

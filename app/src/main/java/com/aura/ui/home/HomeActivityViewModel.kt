@@ -25,6 +25,7 @@ class HomeActivityViewModel @Inject constructor(
 
         viewModelScope.launch {
 
+            // FORCE 1 sec to TEST
             _uiState.update { currentState ->
                 currentState.copy(
                     isViewLoading = true,
@@ -41,7 +42,7 @@ class HomeActivityViewModel @Inject constructor(
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            balanceReady = false,
+                            isBalanceReady = false,
                             isViewLoading = false,
                             errorMessage = balanceUpdate.message
                         )
@@ -60,7 +61,7 @@ class HomeActivityViewModel @Inject constructor(
                 is Result.Success -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            balanceReady = balanceUpdate.value.balance != null,
+                            isBalanceReady = balanceUpdate.value.balance != null,
                             balance = balanceUpdate.value.balance,
                             isViewLoading = false,
                             errorMessage = null
@@ -70,11 +71,20 @@ class HomeActivityViewModel @Inject constructor(
             }
         }
     }
+
+    fun reInit() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isBalanceReady = null,
+                balance = null
+            )
+        }
+    }
 }
 
 data class QueryUiState(
     val balance: Double? = null,
-    val balanceReady: Boolean? = null,
-    val isViewLoading: Boolean = false,
+    val isBalanceReady: Boolean? = null,
+    val isViewLoading: Boolean? = null,
     val errorMessage: String? = null
 )
