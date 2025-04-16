@@ -43,28 +43,30 @@ class LoginActivity : AppCompatActivity() {
         val login = binding.login
         val loading = binding.loading
         loginUiManage(identifier, password, login)
+
+
+
         login.setOnClickListener {
-
-            login.isEnabled = false
-            loading.isVisible = true
-
             lifecycleScope.launch {
-
                 viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
+            }
+        }
 
-                viewModel.uiState.collect {
+        lifecycleScope.launch {
+            viewModel.uiState.collect {
 
-                    loading.isVisible = it.isViewLoading
+                login.isEnabled = !it.isViewLoading
+                loading.isVisible = it.isViewLoading
 
-                    if (it.logged == true)
-                        toastMessage(getString(R.string.login_success))
-                    else if (it.logged == false) {
-                        loginRetryUi(login)
-                        toastMessage(getString(R.string.login_failed))
-                    }
-
-                    if (it.errorMessage?.isNotBlank() == true) toastMessage(it.errorMessage)
+                if (it.logged == true) {
+                    homeLoader()
+                    toastMessage(getString(R.string.login_success))
+                } else if (it.logged == false) {
+                    loginRetryUi(login)
+                    toastMessage(getString(R.string.login_failed))
                 }
+
+                if (it.errorMessage?.isNotBlank() == true) toastMessage(it.errorMessage)
             }
         }
     }
