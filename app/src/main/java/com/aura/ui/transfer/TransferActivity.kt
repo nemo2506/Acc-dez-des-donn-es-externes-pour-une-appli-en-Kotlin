@@ -51,36 +51,30 @@ class TransferActivity : AppCompatActivity() {
         dataUserUi(recipient, amount, transfer)
 
         binding.transfer.setOnClickListener {
-            lifecycleScope.launch {
+            viewModel.getAuraTransfer(
+                currentId,
+                recipient.text.toString(),
+                amount.text.toString().toDouble()
+            )
+        }
 
-                viewModel.getAuraTransfer(
-                    currentId,
-                    recipient.text.toString(),
-                    amount.text.toString().toDouble()
-                )
-                viewModel.getAuraBalance(currentId)
+        lifecycleScope.launch {
 
-                viewModel.uiState.collect {
-                    loading.isVisible = it.isViewLoading
-                    transfer.isEnabled = !it.isViewLoading
+            viewModel.uiState.collect {
+                loading.isVisible = it.isViewLoading
+                transfer.isEnabled = !it.isViewLoading
 
-                    if (it.transferred == true)
-                        toastMessage(getString(R.string.transfer_success))
-
-                    if (it.transferred == false)
-                        toastMessage(getString(R.string.transfer_failed))
-
-                    if (it.balanceReady == true) {
-                        homeLoader()
-                        toastMessage(getString(R.string.balance_success))
-                    }
-
-                    if (it.balanceReady == false)
-                        toastMessage(getString(R.string.balance_failed))
-
-                    if (it.errorMessage?.isNotBlank() == true)
-                        toastMessage(it.errorMessage)
+                if (it.transferred == true){
+                    homeLoader()
+                    toastMessage(getString(R.string.transfer_success))
                 }
+
+
+                if (it.transferred == false)
+                    toastMessage(getString(R.string.transfer_failed))
+
+                if (it.errorMessage?.isNotBlank() == true)
+                    toastMessage(it.errorMessage)
             }
         }
 
