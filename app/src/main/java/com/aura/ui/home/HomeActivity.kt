@@ -1,8 +1,10 @@
 package com.aura.ui.home
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -30,13 +32,18 @@ class HomeActivity : AppCompatActivity() {
      */
     private lateinit var binding: ActivityHomeBinding
     private val viewModel: HomeActivityViewModel by viewModels()
+    private lateinit var currentId: String
 
     /**
      * A callback for the result of starting the TransferActivity.
      */
-    @SuppressLint("SetTextI18n")
     private val startTransferActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                currentId = data?.getStringExtra("identifier").toString()
+                Log.d("RESULT", "Received identifier: $currentId")
+            }
         }
 
     @SuppressLint("SetTextI18n")
@@ -50,9 +57,11 @@ class HomeActivity : AppCompatActivity() {
         val loading = binding.loading
 
         lifecycleScope.launch {
-            viewModel.getAuraBalance()
+            viewModel.getAuraBalance(currentId)
             viewModel.uiState.collect {
+
                 loading.isVisible = it.isViewLoading
+
                 if (it.balanceReady == true) {
                     balance.text = "%.2f€".format(it.balance)
                     toastMessage(getString(R.string.balance_success))
