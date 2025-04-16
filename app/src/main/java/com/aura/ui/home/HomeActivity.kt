@@ -57,13 +57,17 @@ class HomeActivity : AppCompatActivity() {
         val transfer = binding.transfer
         val retry = binding.retry
 
+        viewModel.getAuraBalance(currentId)
+        retry.setOnClickListener(){
+            viewModel.getAuraBalance(currentId)
+        }
+
         lifecycleScope.launch {
 
-            viewModel.getAuraBalance(currentId)
             viewModel.uiState.collect {
 
                 loading.isVisible = it.isViewLoading
-                retry.isVisible = !it.balanceReady!!
+                retry.isVisible = it.balanceReady == false
 
                 if (it.balanceReady == true) {
                     balance.text = "%.2f€".format(it.balance)
