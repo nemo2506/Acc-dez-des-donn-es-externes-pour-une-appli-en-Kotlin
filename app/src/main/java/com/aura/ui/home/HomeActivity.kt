@@ -19,6 +19,7 @@ import com.aura.databinding.ActivityHomeBinding
 import com.aura.ui.login.LoginActivity
 import com.aura.ui.transfer.TransferActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**

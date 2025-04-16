@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 
@@ -21,15 +22,34 @@ class TransferActivityViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TransferUiState())
     val uiState: StateFlow<TransferUiState> = _uiState.asStateFlow()
 
+    fun transferManage(isRecipient: Boolean, isAmout: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isTransferReady = isRecipient && isAmout
+            )
+        }
+    }
+
     fun getAuraTransfer(currentId: String, recipient: String, amount: Double) {
 
         viewModelScope.launch {
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    isViewLoading = true,
+                    errorMessage = null
+                )
+            }
+            val startTime = System.currentTimeMillis()
+            val elapsed = System.currentTimeMillis() - startTime
+            val remainingDelay = 1000 - elapsed
+            if (remainingDelay > 0) delay(remainingDelay)
+
             when (val transferUpdate = dataRepository.getTransfer(currentId, recipient, amount)) {
+
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            transferred = false,
-                            isViewLoading = false,
                             errorMessage = transferUpdate.message
                         )
                     }
@@ -38,8 +58,7 @@ class TransferActivityViewModel @Inject constructor(
                 Result.Loading -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isViewLoading = true,
-                            errorMessage = null
+                            isViewLoading = true
                         )
                     }
                 }
@@ -47,9 +66,7 @@ class TransferActivityViewModel @Inject constructor(
                 is Result.Success -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            transferred = transferUpdate.value.done,
-                            isViewLoading = false,
-                            errorMessage = null
+                            transferred = transferUpdate.value.done
                         )
                     }
                 }
@@ -59,6 +76,7 @@ class TransferActivityViewModel @Inject constructor(
 }
 
 data class TransferUiState(
+    val isTransferReady: Boolean = false,
     val transferred: Boolean? = null,
     val isViewLoading: Boolean = false,
     val errorMessage: String? = null

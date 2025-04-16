@@ -48,7 +48,8 @@ class TransferActivity : AppCompatActivity() {
         val transfer = binding.transfer
         val loading = binding.loading
 
-        dataUserUi(recipient, amount, transfer)
+        recipient.addTextChangedListener(textWatcher)
+        amount.addTextChangedListener(textWatcher)
 
         transfer.setOnClickListener {
             viewModel.getAuraTransfer(
@@ -62,7 +63,7 @@ class TransferActivity : AppCompatActivity() {
 
             viewModel.uiState.collect {
                 loading.isVisible = it.isViewLoading
-                transfer.isEnabled = !it.isViewLoading
+                transfer.isEnabled = it.transferred == true || it.isTransferReady == true
 
                 if (it.transferred == true){
                     homeLoader()
@@ -86,20 +87,15 @@ class TransferActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun dataUserUi(recipient: EditText, amount: EditText, transfer: Button) {
-        transfer.isEnabled = false
-        val presence = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                val isRecipientNotEmpty = recipient.text?.isNotEmpty() == true
-                val isAmountNotEmpty = amount.text?.isNotEmpty() == true
-                transfer.isEnabled = isRecipientNotEmpty && isAmountNotEmpty
-            }
+    private val textWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        override fun afterTextChanged(s: Editable?) {
+            viewModel.transferManage(
+                binding.recipient.text.isNotEmpty(),
+                binding.amount.text.isNotEmpty()
+            )
         }
-
-        recipient.addTextChangedListener(presence)
-        amount.addTextChangedListener(presence)
     }
 
     private fun toastMessage(message: String) {

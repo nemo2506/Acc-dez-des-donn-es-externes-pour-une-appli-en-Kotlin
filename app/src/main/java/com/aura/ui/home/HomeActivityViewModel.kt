@@ -22,9 +22,22 @@ class HomeActivityViewModel @Inject constructor(
     val uiState: StateFlow<QueryUiState> = _uiState.asStateFlow()
 
     fun getAuraBalance(currentId: String) {
+
         viewModelScope.launch {
-            delay(2000)
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    isViewLoading = true,
+                    errorMessage = null
+                )
+            }
+            val startTime = System.currentTimeMillis()
+            val elapsed = System.currentTimeMillis() - startTime
+            val remainingDelay = 1000 - elapsed
+            if (remainingDelay > 0)
+                delay(remainingDelay)
             when (val balanceUpdate = dataRepository.getBalance(currentId)) {
+
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(

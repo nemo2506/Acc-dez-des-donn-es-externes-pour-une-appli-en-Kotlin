@@ -18,6 +18,7 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import com.aura.R
+import kotlin.math.log
 
 /**
  * The login activity for the app.
@@ -43,8 +44,8 @@ class LoginActivity : AppCompatActivity() {
         val login = binding.login
         val loading = binding.loading
 
-        login.isEnabled = false
-        loginUiManage(identifier, password, login)
+        identifier.addTextChangedListener(textWatcher)
+        password.addTextChangedListener(textWatcher)
 
         login.setOnClickListener {
             viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
@@ -54,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
             viewModel.uiState.collect {
 
                 loading.isVisible = it.isViewLoading
-                login.isEnabled = it.logged == false
+                login.isEnabled = it.logged == false || it.isLoginReady == true
 
                 if (it.logged == true) {
                     homeLoader(identifier)
@@ -67,18 +68,15 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginUiManage(identifier: EditText, password: EditText, login: Button) {
-        val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                val isIdentifierNotEmpty = identifier.text?.isNotEmpty() == true
-                val isPasswordNotEmpty = password.text?.isNotEmpty() == true
-                login.isEnabled = isIdentifierNotEmpty && isPasswordNotEmpty
-            }
+    private val textWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        override fun afterTextChanged(s: Editable?) {
+            viewModel.loginManage(
+                binding.identifier.text.isNotEmpty(),
+                binding.password.text.isNotEmpty()
+            )
         }
-        identifier.addTextChangedListener(textWatcher)
-        password.addTextChangedListener(textWatcher)
     }
 
     private fun homeLoader(currentId: EditText) {

@@ -29,6 +29,7 @@ class BankRepository @Inject constructor(
 
     suspend fun getBalance(currentId: String): Result<BalanceReportModel> {
         return try {
+            Result.Loading
             val result = dataService.fetchBalance(currentId)
             val list = result.body() ?: throw Exception("Invalid data")
             val accounts: List<Account> = list.map { it.toDomainModel() }
