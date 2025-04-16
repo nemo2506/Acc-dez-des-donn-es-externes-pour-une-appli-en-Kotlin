@@ -10,6 +10,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.aura.R
 import com.aura.databinding.ActivityHomeBinding
@@ -36,9 +37,6 @@ class HomeActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private val startTransferActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            val newBalance = result.data?.getDoubleExtra("newBalance", 0.0)
-            val balance = newBalance ?: viewModel.balance
-            binding.balance.text = "%.2f€".format(balance)
         }
 
     @SuppressLint("SetTextI18n")
@@ -49,11 +47,13 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val balance = binding.balance
+        val loading = binding.loading
 
         lifecycleScope.launch {
             viewModel.getAuraBalance()
             viewModel.uiState.collect {
-                if (it.balanceReady == true){
+                loading.isVisible = it.isViewLoading
+                if (it.balanceReady == true) {
                     balance.text = "%.2f€".format(it.balance)
                     toastMessage(getString(R.string.balance_success))
                 }
@@ -63,8 +63,6 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-
-        binding.balance.text = "%.2f€".format(viewModel.balance)
         binding.transfer.setOnClickListener {
             startTransferActivityForResult.launch(
                 Intent(this@HomeActivity, TransferActivity::class.java)
