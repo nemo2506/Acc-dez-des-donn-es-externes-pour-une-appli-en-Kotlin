@@ -65,8 +65,8 @@
         android:layout_marginBottom="64dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/transfer"
-        app:layout_constraintStart_toStartOf="@+id/transfer"
+        app:layout_constraintEnd_toEndOf="@+id/balance"
+        app:layout_constraintStart_toStartOf="@+id/balance"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3" />
 
