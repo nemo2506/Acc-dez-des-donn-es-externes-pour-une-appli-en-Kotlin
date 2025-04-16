@@ -45,6 +45,7 @@ class HomeActivityViewModel @Inject constructor(
                 _uiState.update { currentState ->
                     currentState.copy(
                         balanceReady = balanceUpdate.value.balance != null,
+                        balance = balanceUpdate.value.balance,
                         isViewLoading = false,
                         errorMessage = null
                     )
@@ -55,6 +56,7 @@ class HomeActivityViewModel @Inject constructor(
 }
 
 data class QueryUiState(
+    val balance: Double? = null,
     val balanceReady: Boolean? = null,
     val isViewLoading: Boolean = false,
     val errorMessage: String? = null

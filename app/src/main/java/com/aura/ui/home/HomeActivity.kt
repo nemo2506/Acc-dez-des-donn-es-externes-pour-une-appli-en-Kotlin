@@ -48,11 +48,16 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val balance = binding.balance
+
         lifecycleScope.launch {
             viewModel.getAuraBalance()
             viewModel.uiState.collect {
-                if (it.balanceReady == true)
+                if (it.balanceReady == true){
+                    balance.text = "%.2f€".format(it.balance)
                     toastMessage(getString(R.string.balance_success))
+                }
+
                 if (it.balanceReady == false)
                     toastMessage(getString(R.string.balance_failed))
             }
