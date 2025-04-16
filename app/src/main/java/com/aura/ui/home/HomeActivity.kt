@@ -39,25 +39,24 @@ class HomeActivity : AppCompatActivity() {
      */
     private val startTransferActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                currentId = data?.getStringExtra("identifier").toString()
-                Log.d("HomeActivity RESULT", "Received identifier: $currentId")
-            }
+            //TODO
         }
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        currentId = intent.getStringExtra("currentId").toString()
+
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
 
         val balance = binding.balance
         val loading = binding.loading
         val transfer = binding.transfer
-
         lifecycleScope.launch {
+
             viewModel.getAuraBalance(currentId)
             viewModel.uiState.collect {
 

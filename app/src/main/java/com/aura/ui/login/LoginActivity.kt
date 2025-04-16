@@ -81,10 +81,11 @@ class LoginActivity : AppCompatActivity() {
         password.addTextChangedListener(textWatcher)
     }
 
-    private fun homeLoader(id: EditText) {
-        startActivity(Intent(this, HomeActivity::class.java).apply {
-            putExtra("currentId", id.text.toString())
-        })
+    private fun homeLoader(currentId: EditText) {
+        val intent = Intent(this, HomeActivity::class.java).apply {
+            putExtra("currentId", currentId.text.toString())
+        }
+        startActivity(intent)
         finish()
     }
 

@@ -34,18 +34,11 @@ class TransferActivity : AppCompatActivity() {
     private val viewModel: TransferActivityViewModel by viewModels()
     private lateinit var currentId: String
 
-    private val startForResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                val userId = data?.getStringExtra("user_id")
-                Log.d("TransferActivity RESULT", "Received user_id: $userId")
-            }
-        }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        currentId = intent.getStringExtra("currentId").toString()
 
         binding = ActivityTransferBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -94,7 +87,8 @@ class TransferActivity : AppCompatActivity() {
     }
 
     private fun homeLoader() {
-        startActivity(Intent(this, HomeActivity::class.java))
+        startActivity(Intent(this, HomeActivity::class.java)
+            .apply { putExtra("currentId", currentId) })
         finish()
     }
 
