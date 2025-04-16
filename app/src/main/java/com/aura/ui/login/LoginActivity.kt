@@ -73,7 +73,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun loginRetryUi(login: Button) {
         login.isEnabled = true
-        login.text = getString(R.string.try_again)
     }
 
     private fun loginUiManage(identifier: EditText, password: EditText, login: Button) {
