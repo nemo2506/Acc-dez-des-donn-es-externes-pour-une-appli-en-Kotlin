@@ -50,7 +50,7 @@ class TransferActivity : AppCompatActivity() {
 
         dataUserUi(recipient, amount, transfer)
 
-        binding.transfer.setOnClickListener {
+        transfer.setOnClickListener {
             viewModel.getAuraTransfer(
                 currentId,
                 recipient.text.toString(),

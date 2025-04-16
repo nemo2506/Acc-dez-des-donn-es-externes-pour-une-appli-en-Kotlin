@@ -51,9 +51,8 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState.collect {
 
-                login.isEnabled = !it.isViewLoading
                 loading.isVisible = it.isViewLoading
-                login.isEnabled = it.logged == true
+                login.isEnabled = !it.isViewLoading
 
                 if (it.logged == true) {
                     homeLoader(identifier)
