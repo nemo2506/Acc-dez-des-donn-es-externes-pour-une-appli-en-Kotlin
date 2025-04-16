@@ -42,6 +42,8 @@ class LoginActivity : AppCompatActivity() {
         val password = binding.password
         val login = binding.login
         val loading = binding.loading
+
+        login.isEnabled = false
         loginUiManage(identifier, password, login)
 
         login.setOnClickListener {
@@ -52,7 +54,7 @@ class LoginActivity : AppCompatActivity() {
             viewModel.uiState.collect {
 
                 loading.isVisible = it.isViewLoading
-                login.isEnabled = !it.isViewLoading
+                login.isEnabled = it.logged == false
 
                 if (it.logged == true) {
                     homeLoader(identifier)
@@ -66,7 +68,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUiManage(identifier: EditText, password: EditText, login: Button) {
-        login.isEnabled = false
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
