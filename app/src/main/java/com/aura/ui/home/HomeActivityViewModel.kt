@@ -72,7 +72,7 @@ class HomeActivityViewModel @Inject constructor(
         }
     }
 
-    fun reInit() {
+    fun reset() {
         _uiState.update { currentState ->
             currentState.copy(
                 isBalanceReady = null,

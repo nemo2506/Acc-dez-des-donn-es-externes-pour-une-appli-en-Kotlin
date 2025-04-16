@@ -63,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 if (it.logged == false) {
-                    viewModel.reInit()
+                    viewModel.reset()
                     toastMessage(getString(R.string.login_failed))
                 }
 

@@ -76,7 +76,7 @@ class HomeActivity : AppCompatActivity() {
                 }
 
                 if (it.isBalanceReady == false){
-                    viewModel.reInit()
+                    viewModel.reset()
                     toastMessage(getString(R.string.balance_failed))
                 }
 

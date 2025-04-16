@@ -71,7 +71,7 @@ class TransferActivity : AppCompatActivity() {
                 }
 
                 if (it.transferred == false){
-                    viewModel.reInit()
+                    viewModel.reset()
                     toastMessage(getString(R.string.transfer_failed))
                 }
 
