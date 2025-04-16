@@ -55,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
             viewModel.uiState.collect {
 
                 loading.isVisible = it.isViewLoading == true
-                login.isEnabled = it.logged == false || it.isDataReady == true
+                login.isEnabled = it.logged == false || it.isUserDataReady == true
 
                 if (it.logged == true) {
                     homeLoader(identifier)

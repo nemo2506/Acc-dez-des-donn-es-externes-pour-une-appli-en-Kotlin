@@ -63,7 +63,7 @@ class TransferActivity : AppCompatActivity() {
 
             viewModel.uiState.collect {
                 loading.isVisible = it.isViewLoading == true
-                transfer.isEnabled = it.transferred == true || it.isDataReady == true
+                transfer.isEnabled = it.transferred == true || it.isUserDataReady == true
 
                 if (it.transferred == true){
                     homeLoader()

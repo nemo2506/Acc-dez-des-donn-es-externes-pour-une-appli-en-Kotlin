@@ -26,7 +26,7 @@ class TransferActivityViewModel @Inject constructor(
     fun transferManage(isRecipient: Boolean, isAmount: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
-                isDataReady = isRecipient && isAmount
+                isUserDataReady = isRecipient && isAmount
             )
         }
     }
@@ -83,6 +83,7 @@ class TransferActivityViewModel @Inject constructor(
     fun reset() {
         _uiState.update { currentState ->
             currentState.copy(
+                isUserDataReady = null,
                 transferred = null
             )
         }
@@ -90,7 +91,7 @@ class TransferActivityViewModel @Inject constructor(
 }
 
 data class TransferUiState(
-    val isDataReady: Boolean? = null,
+    val isUserDataReady: Boolean? = null,
     val transferred: Boolean? = null,
     val isViewLoading: Boolean? = null,
     val errorMessage: String? = null
