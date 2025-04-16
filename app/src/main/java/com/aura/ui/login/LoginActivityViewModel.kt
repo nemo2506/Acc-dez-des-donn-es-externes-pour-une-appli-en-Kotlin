@@ -1,6 +1,7 @@
 package com.aura.ui.login
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.aura.data.repository.BankRepository
 import com.aura.data.repository.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -19,37 +21,41 @@ class LoginActivityViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(QueryUiState())
     val uiState: StateFlow<QueryUiState> = _uiState.asStateFlow()
 
-    suspend fun getAuraLogin(id: String, password: String) {
+    fun getAuraLogin(currentId: String, password: String) {
 
-        when (val loginUpdate = dataRepository.getLogin(id, password)) {
-            is Result.Failure -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        logged = false,
-                        isViewLoading = false,
-                        errorMessage = loginUpdate.message
-                    )
+        viewModelScope.launch {
+
+            when (val loginUpdate = dataRepository.getLogin(currentId, password)) {
+                is Result.Failure -> {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            logged = false,
+                            isViewLoading = false,
+                            errorMessage = loginUpdate.message
+                        )
+                    }
+                }
+
+                Result.Loading -> {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            isViewLoading = true,
+                            errorMessage = null
+                        )
+                    }
+                }
+
+                is Result.Success -> {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            logged = loginUpdate.value.granted,
+                            isViewLoading = false,
+                            errorMessage = null
+                        )
+                    }
                 }
             }
 
-            Result.Loading -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isViewLoading = true,
-                        errorMessage = null
-                    )
-                }
-            }
-
-            is Result.Success -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        logged = loginUpdate.value.granted,
-                        isViewLoading = false,
-                        errorMessage = null
-                    )
-                }
-            }
         }
     }
 }

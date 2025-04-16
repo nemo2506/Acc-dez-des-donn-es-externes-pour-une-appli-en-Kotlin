@@ -14,12 +14,10 @@ import javax.inject.Inject
 class BankRepository @Inject constructor(
     private val dataService: ManageClient
 ) {
-    private lateinit var currentId: String
 
     suspend fun getLogin(id: String, password: String): Result<LoginReportModel> {
         return try {
             Result.Loading
-            currentId = id
             val user = User(id, password)
             val result = dataService.fetchAccess(user)
             val model = result.body()?.toDomainModel() ?: throw Exception("Invalid data")
@@ -29,7 +27,7 @@ class BankRepository @Inject constructor(
         }
     }
 
-    suspend fun getBalance(): Result<BalanceReportModel> {
+    suspend fun getBalance(currentId: String): Result<BalanceReportModel> {
         return try {
             val result = dataService.fetchBalance(currentId)
             val list = result.body() ?: throw Exception("Invalid data")
@@ -42,7 +40,7 @@ class BankRepository @Inject constructor(
         }
     }
 
-    suspend fun getTransfer(recipient: String, amount: Double): Result<TransferReportModel> {
+    suspend fun getTransfer(currentId: String, recipient: String, amount: Double): Result<TransferReportModel> {
         return try {
             Result.Loading
             val transfer = Transfer(currentId, recipient, amount)
