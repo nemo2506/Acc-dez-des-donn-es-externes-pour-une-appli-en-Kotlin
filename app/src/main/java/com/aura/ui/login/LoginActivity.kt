@@ -57,14 +57,13 @@ class LoginActivity : AppCompatActivity() {
 
                 login.isEnabled = !it.isViewLoading
                 loading.isVisible = it.isViewLoading
+                login.isEnabled = it.logged == true
 
                 if (it.logged == true) {
                     homeLoader()
                     toastMessage(getString(R.string.login_success))
-                } else if (it.logged == false) {
-                    login.isEnabled = it.logged
+                } else if (it.logged == false)
                     toastMessage(getString(R.string.login_failed))
-                }
 
                 if (it.errorMessage?.isNotBlank() == true) toastMessage(it.errorMessage)
             }
