@@ -3,18 +3,20 @@ package com.aura.ui.home
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.aura.R
 import com.aura.databinding.ActivityHomeBinding
 import com.aura.ui.login.LoginActivity
 import com.aura.ui.transfer.TransferActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 /**
  * The home activity for the app.
@@ -46,6 +48,17 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        lifecycleScope.launch {
+            viewModel.getAuraBalance()
+            viewModel.uiState.collect {
+                if (it.balanceReady == true)
+                    toastMessage(getString(R.string.balance_success))
+                if (it.balanceReady == false)
+                    toastMessage(getString(R.string.balance_failed))
+            }
+        }
+
+
         binding.balance.text = "%.2f€".format(viewModel.balance)
         binding.transfer.setOnClickListener {
             startTransferActivityForResult.launch(
@@ -69,5 +82,9 @@ class HomeActivity : AppCompatActivity() {
 
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun toastMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

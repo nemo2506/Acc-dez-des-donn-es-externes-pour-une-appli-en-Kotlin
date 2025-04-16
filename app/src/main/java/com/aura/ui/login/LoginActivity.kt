@@ -51,21 +51,14 @@ class LoginActivity : AppCompatActivity() {
             lifecycleScope.launch {
 
                 viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
-                viewModel.getAuraBalance()
+//                viewModel.getAuraBalance()
 
                 viewModel.uiState.collect {
                     loading.isVisible = it.isViewLoading
                     if (it.logged == true) {
                         toastMessage(getString(R.string.login_success))
 
-                        if (it.balanceReady == true) {
-                            homeLoader()
-                            toastMessage(getString(R.string.balance_success))
-                        }
-                        if (it.balanceReady == false) {
-                            loginRetryUi(login)
-                            toastMessage(getString(R.string.balance_failed))
-                        }
+
 
                     } else if (it.logged == false) {
                         loginRetryUi(login)

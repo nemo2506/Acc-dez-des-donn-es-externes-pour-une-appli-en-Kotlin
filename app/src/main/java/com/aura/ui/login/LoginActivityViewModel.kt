@@ -52,45 +52,10 @@ class LoginActivityViewModel @Inject constructor(
             }
         }
     }
-
-    suspend fun getAuraBalance() {
-
-        when (val balanceUpdate = dataRepository.getBalance()) {
-            is Result.Failure -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        balanceReady = false,
-                        isViewLoading = false,
-                        errorMessage = balanceUpdate.message
-                    )
-                }
-            }
-
-            Result.Loading -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isViewLoading = true,
-                        errorMessage = null
-                    )
-                }
-            }
-
-            is Result.Success -> {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        balanceReady = balanceUpdate.value.balance != null,
-                        isViewLoading = false,
-                        errorMessage = null
-                    )
-                }
-            }
-        }
-    }
 }
 
 data class QueryUiState(
     val logged: Boolean? = null,
-    val balanceReady: Boolean? = null,
     val isViewLoading: Boolean = false,
     val errorMessage: String? = null
 )
