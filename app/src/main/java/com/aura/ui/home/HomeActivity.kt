@@ -58,36 +58,53 @@ class HomeActivity : AppCompatActivity() {
         val transfer = binding.transfer
         val retry = binding.retry
 
+        /**
+         * Get Balance by loading or by clicking
+         */
         viewModel.getAuraBalance(currentId)
-        retry.setOnClickListener(){
+        retry.setOnClickListener() {
             viewModel.getAuraBalance(currentId)
         }
 
-        lifecycleScope.launch {
-
-            viewModel.uiState.collect {
-
-                loading.isVisible = it.isViewLoading == true
-                retry.isVisible = it.isBalanceReady == false
-
-                if (it.isBalanceReady == true) {
-                    balance.text = "%.2f€".format(it.balance)
-                    toastMessage(getString(R.string.balance_success))
-                }
-
-                if (it.isBalanceReady == false){
-                    viewModel.reset()
-                    toastMessage(getString(R.string.balance_failed))
-                }
-
-            }
-        }
-
+        /**
+         * When button Transfer is clicked TransferActivity is loading
+         */
         transfer.setOnClickListener {
             startTransferActivityForResult.launch(
                 Intent(this, TransferActivity::class.java)
                     .putExtra("currentId", currentId)
             )
+        }
+
+        /**
+         * Scope to viewModel to interactivity
+         */
+        lifecycleScope.launch {
+
+            viewModel.uiState.collect {
+
+                /**
+                 * Interface Loader visibility and Button enabled depends to scope interactivity
+                 */
+                loading.isVisible = it.isViewLoading == true
+                retry.isVisible = it.isBalanceReady == false
+
+                /**
+                 * At step balance ready it's displaying to screen
+                 */
+                if (it.isBalanceReady == true) {
+                    balance.text = "%.2f€".format(it.balance)
+                    toastMessage(getString(R.string.balance_success))
+                }
+
+                /**
+                 * At step not balance stateflow is reset
+                 */
+                if (it.isBalanceReady == false) {
+                    viewModel.reset()
+                    toastMessage(getString(R.string.balance_failed))
+                }
+            }
         }
     }
 
@@ -108,6 +125,9 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Simplify methode to screen message
+     */
     private fun toastMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }

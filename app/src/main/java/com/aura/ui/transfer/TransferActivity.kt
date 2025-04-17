@@ -1,16 +1,10 @@
 package com.aura.ui.transfer
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -38,6 +32,9 @@ class TransferActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        /**
+         * User Id from preview Screen
+         */
         currentId = intent.getStringExtra("currentId").toString()
 
         binding = ActivityTransferBinding.inflate(layoutInflater)
@@ -48,9 +45,15 @@ class TransferActivity : AppCompatActivity() {
         val transfer = binding.transfer
         val loading = binding.loading
 
+        /**
+         * Recipient and Amount is verified to ensure the data is not empty
+         */
         recipient.addTextChangedListener(textWatcher)
         amount.addTextChangedListener(textWatcher)
 
+        /**
+         * When button transfer is clicked viewModel get transfer
+         */
         transfer.setOnClickListener {
             viewModel.getAuraTransfer(
                 currentId,
@@ -59,22 +62,38 @@ class TransferActivity : AppCompatActivity() {
             )
         }
 
+        /**
+         * Scope to viewModel to interactivity
+         */
         lifecycleScope.launch {
 
             viewModel.uiState.collect {
+
+                /**
+                 * Interface Loader visibility and Button enabled depends to scope interactivity
+                 */
                 loading.isVisible = it.isViewLoading == true
                 transfer.isEnabled = it.transferred == true || it.isUserDataReady == true
 
-                if (it.transferred == true){
+                /**
+                 * At step logged HomeActivity is loading
+                 */
+                if (it.transferred == true) {
                     homeLoader()
                     toastMessage(getString(R.string.transfer_success))
                 }
 
-                if (it.transferred == false){
+                /**
+                 * Not transferred an error message and reset stateflow
+                 */
+                if (it.transferred == false) {
                     viewModel.reset()
                     toastMessage(getString(R.string.transfer_failed))
                 }
 
+                /**
+                 * Error message generic
+                 */
                 if (it.errorMessage?.isNotBlank() == true)
                     toastMessage(it.errorMessage)
             }
@@ -82,12 +101,18 @@ class TransferActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * Methode to load HomeActivity and pass User Id to next Activity
+     */
     private fun homeLoader() {
         startActivity(Intent(this, HomeActivity::class.java)
             .apply { putExtra("currentId", currentId) })
         finish()
     }
 
+    /**
+     * Methode to link viewModel to pass control by stateflow
+     */
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -99,6 +124,9 @@ class TransferActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Simplify methode to screen message
+     */
     private fun toastMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
