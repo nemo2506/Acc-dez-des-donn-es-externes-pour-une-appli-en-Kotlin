@@ -141,6 +141,6 @@ class LoginActivityViewModel @Inject constructor(
 data class QueryUiState(
     val isUserDataReady: Boolean? = null,
     val logged: Boolean? = null,
-    val isViewLoading: Boolean? = null,
+    val isViewLoading: Boolean = false,
     val errorMessage: String? = null
 )

@@ -64,9 +64,8 @@ class LoginActivity : AppCompatActivity() {
 
                 // Show or hide the loading indicator
                 loading.isVisible = it.isViewLoading == true
-
-                // Enable login button based on login state or data readiness
-                login.isEnabled = it.logged == false || it.isUserDataReady == true
+                // Enable login button based on loader state or data readiness
+                login.isEnabled = it.isViewLoading == false && it.isUserDataReady == true
 
                 // Navigate to HomeActivity if login is successful
                 if (it.logged == true) {
