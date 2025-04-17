@@ -1,6 +1,5 @@
 package com.aura.data.repository
 
-import androidx.lifecycle.MutableLiveData
 import com.aura.data.network.ManageClient
 import com.aura.domain.model.Account
 import com.aura.domain.model.BalanceReportModel
@@ -11,10 +10,15 @@ import com.aura.domain.model.User
 import javax.inject.Inject
 
 
+/**
+ * Return Result by state from api response
+ */
 class BankRepository @Inject constructor(
     private val dataService: ManageClient
 ) {
-
+    /**
+     * Result to Login
+     */
     suspend fun getLogin(id: String, password: String): Result<LoginReportModel> {
         return try {
             Result.Loading
@@ -27,6 +31,9 @@ class BankRepository @Inject constructor(
         }
     }
 
+    /**
+     * Result to Balance
+     */
     suspend fun getBalance(currentId: String): Result<BalanceReportModel> {
         return try {
             Result.Loading
@@ -34,14 +41,21 @@ class BankRepository @Inject constructor(
             val list = result.body() ?: throw Exception("Invalid data")
             val accounts: List<Account> = list.map { it.toDomainModel() }
             val mainAccount = accounts.firstOrNull { it.main }
-            val model = BalanceReportModel(mainAccount?.balance, null)
+            val model = BalanceReportModel(mainAccount?.balance)
             Result.Success(model)
         } catch (error: Exception) {
             Result.Failure(error.message)
         }
     }
 
-    suspend fun getTransfer(currentId: String, recipient: String, amount: Double): Result<TransferReportModel> {
+    /**
+     * Result to Transfer
+     */
+    suspend fun getTransfer(
+        currentId: String,
+        recipient: String,
+        amount: Double
+    ): Result<TransferReportModel> {
         return try {
             Result.Loading
             val transfer = Transfer(currentId, recipient, amount)

@@ -6,18 +6,22 @@ import com.aura.domain.model.TransferReportModel
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+/**
+ * Return api result to login in report
+ */
 @JsonClass(generateAdapter = true)
 data class LoginBankResponse(
     @Json(name = "granted")
     val granted: Boolean
 ) {
     fun toDomainModel(): LoginReportModel {
-        val message: String =
-            if (granted) "connexion réussi" else ""
-        return LoginReportModel(granted, message)
+        return LoginReportModel(granted)
     }
 }
 
+/**
+ * Return api result to balance in report
+ */
 @JsonClass(generateAdapter = true)
 data class AccountBankResponse(
     @Json(name = "id")
@@ -32,12 +36,15 @@ data class AccountBankResponse(
     }
 }
 
+/**
+ * Return api result to transfer in report
+ */
 @JsonClass(generateAdapter = true)
 data class TransferBankResponse(
     @Json(name = "result")
     val done: Boolean
 ) {
     fun toDomainModel(): TransferReportModel {
-        return TransferReportModel(done, null)
+        return TransferReportModel(done)
     }
 }
