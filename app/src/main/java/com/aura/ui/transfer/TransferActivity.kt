@@ -16,7 +16,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 /**
- * The transfer activity for the app.
+ * The activity responsible for handling money transfers in the app.
+ * This allows the user to input recipient information and transfer amount.
  */
 @AndroidEntryPoint
 class TransferActivity : AppCompatActivity() {
@@ -25,36 +26,40 @@ class TransferActivity : AppCompatActivity() {
      * The binding for the transfer layout.
      */
     private lateinit var binding: ActivityTransferBinding
-    private val viewModel: TransferActivityViewModel by viewModels()
-    private lateinit var currentId: String
 
+    /**
+     * The ViewModel for handling transfer-related logic.
+     */
+    private val viewModel: TransferActivityViewModel by viewModels()
+
+    /**
+     * The current user ID passed from the previous screen.
+     */
+    private lateinit var currentId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        /**
-         * User Id from preview Screen
-         */
+        // Retrieve the user ID passed from the previous screen (HomeActivity)
         currentId = intent.getStringExtra("currentId").toString()
 
+        // Inflate the layout using the binding object
         binding = ActivityTransferBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Extract UI elements from the layout
         val recipient = binding.recipient
         val amount = binding.amount
         val transfer = binding.transfer
         val loading = binding.loading
 
-        /**
-         * Recipient and Amount is verified to ensure the data is not empty
-         */
+        // Verify the recipient and amount inputs to ensure they are not empty
         recipient.addTextChangedListener(textWatcher)
         amount.addTextChangedListener(textWatcher)
 
-        /**
-         * When button transfer is clicked viewModel get transfer
-         */
+        // Handle the transfer button click to initiate the transfer process
         transfer.setOnClickListener {
+            // Call ViewModel method to handle transfer logic
             viewModel.getAuraTransfer(
                 currentId,
                 recipient.text.toString(),
@@ -62,38 +67,28 @@ class TransferActivity : AppCompatActivity() {
             )
         }
 
-        /**
-         * Scope to viewModel to interactivity
-         */
+        // Collect UI state updates from the ViewModel and update the UI accordingly
         lifecycleScope.launch {
 
             viewModel.uiState.collect {
 
-                /**
-                 * Interface Loader visibility and Button enabled depends to scope interactivity
-                 */
+                // Show loading indicator and disable transfer button while loading
                 loading.isVisible = it.isViewLoading == true
                 transfer.isEnabled = it.transferred == true || it.isUserDataReady == true
 
-                /**
-                 * At step logged HomeActivity is loading
-                 */
+                // If the transfer is successful, navigate to HomeActivity
                 if (it.transferred == true) {
                     homeLoader()
                     toastMessage(getString(R.string.transfer_success))
                 }
 
-                /**
-                 * Not transferred an error message and reset stateflow
-                 */
+                // If the transfer fails, reset ViewModel state and show error message
                 if (it.transferred == false) {
                     viewModel.reset()
                     toastMessage(getString(R.string.transfer_failed))
                 }
 
-                /**
-                 * Error message generic
-                 */
+                // Display any error message if available
                 if (it.errorMessage?.isNotBlank() == true)
                     toastMessage(it.errorMessage)
             }
@@ -102,7 +97,7 @@ class TransferActivity : AppCompatActivity() {
     }
 
     /**
-     * Methode to load HomeActivity and pass User Id to next Activity
+     * Navigate to HomeActivity and pass the current user ID to the next activity.
      */
     private fun homeLoader() {
         startActivity(Intent(this, HomeActivity::class.java)
@@ -111,12 +106,13 @@ class TransferActivity : AppCompatActivity() {
     }
 
     /**
-     * Methode to link viewModel to pass control by stateflow
+     * Watches the recipient and amount fields to enable or disable the transfer button.
      */
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         override fun afterTextChanged(s: Editable?) {
+            // Enable or disable the transfer button based on the recipient and amount fields
             viewModel.userDataControl(
                 binding.recipient.text.isNotEmpty(),
                 binding.amount.text.isNotEmpty()
@@ -125,7 +121,9 @@ class TransferActivity : AppCompatActivity() {
     }
 
     /**
-     * Simplify methode to screen message
+     * Simplifies showing toast messages on the screen.
+     *
+     * @param message The message to be displayed in the toast.
      */
     private fun toastMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

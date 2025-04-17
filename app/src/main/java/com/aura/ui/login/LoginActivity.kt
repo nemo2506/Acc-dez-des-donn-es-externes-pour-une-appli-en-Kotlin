@@ -17,7 +17,10 @@ import androidx.core.view.isVisible
 import com.aura.R
 
 /**
- * The login activity for the app.
+ * Activity responsible for handling user login.
+ *
+ * Validates user input, communicates with [LoginActivityViewModel] to handle authentication,
+ * and navigates to [HomeActivity] on successful login.
  */
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
@@ -25,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel: LoginActivityViewModel by viewModels()
 
     /**
-     * The binding for the login layout.
+     * View binding for the login screen layout.
      */
     private lateinit var binding: ActivityLoginBinding
 
@@ -41,56 +44,54 @@ class LoginActivity : AppCompatActivity() {
         val loading = binding.loading
 
         /**
-         * Identifier and Password is verified to ensure the data is not empty
+         * Enable login button only when both identifier and password are not empty.
          */
         identifier.addTextChangedListener(textWatcher)
         password.addTextChangedListener(textWatcher)
 
         /**
-         * When button Login is clicked viewModel get authentication
+         * Login button triggers login process through the ViewModel.
          */
         login.setOnClickListener {
             viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
         }
 
         /**
-         * Scope to viewModel to interactivity
+         * Observe UI state from the ViewModel and update the UI accordingly.
          */
         lifecycleScope.launch {
             viewModel.uiState.collect {
 
-                /**
-                 * Interface Loader visibility and Button enabled depends to scope interactivity
-                 */
+                // Show or hide the loading indicator
                 loading.isVisible = it.isViewLoading == true
+
+                // Enable login button based on login state or data readiness
                 login.isEnabled = it.logged == false || it.isUserDataReady == true
 
-                /**
-                 * At step logged HomeActivity is loading
-                 */
+                // Navigate to HomeActivity if login is successful
                 if (it.logged == true) {
                     homeLoader(identifier)
                     toastMessage(getString(R.string.login_success))
                 }
 
-                /**
-                 * Not logged an error message and reset stateflow
-                 */
+                // Show error and reset state on login failure
                 if (it.logged == false) {
                     viewModel.reset()
                     toastMessage(getString(R.string.login_failed))
                 }
 
-                /**
-                 * Error message generic
-                 */
-                if (it.errorMessage?.isNotBlank() == true) toastMessage(it.errorMessage)
+                // Show a generic error message if present
+                if (it.errorMessage?.isNotBlank() == true) {
+                    toastMessage(it.errorMessage)
+                }
             }
         }
     }
 
     /**
-     * Methode to load HomeActivity and pass User Id to next Activity
+     * Navigates to [HomeActivity] and passes the logged-in user's ID via Intent.
+     *
+     * @param currentId The EditText containing the user identifier.
      */
     private fun homeLoader(currentId: EditText) {
         val intent = Intent(this, HomeActivity::class.java).apply {
@@ -101,7 +102,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     /**
-     * Methode to link viewModel to pass control by stateflow
+     * TextWatcher to notify ViewModel when user input changes,
+     * used to determine if login button should be enabled.
      */
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -115,10 +117,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     /**
-     * Simplify methode to screen message
+     * Displays a toast message on the screen.
+     *
+     * @param message The message to be displayed.
      */
     private fun toastMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
-
 }

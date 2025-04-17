@@ -14,20 +14,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
-
+/**
+ * ViewModel responsible for handling the login logic of the user.
+ *
+ * Validates user credentials, manages UI states for loading, error, and login status,
+ * and communicates with the repository for authentication.
+ */
 @HiltViewModel
 class LoginActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository
 ) : ViewModel() {
 
     /**
-     * StateFlow to inform screen target activity
+     * StateFlow used to represent the UI state in the login screen.
+     * It holds information such as whether user data is ready, whether the login is successful,
+     * and any error messages encountered.
      */
     private val _uiState = MutableStateFlow(QueryUiState())
     val uiState: StateFlow<QueryUiState> = _uiState.asStateFlow()
 
     /**
-     * State Update to inform user data verified
+     * Updates the UI state to reflect whether the user has provided valid data
+     * (non-empty identifier and password).
+     *
+     * @param identifier Boolean indicating if the identifier is not empty.
+     * @param password Boolean indicating if the password is not empty.
      */
     fun userDataControl(identifier: Boolean, password: Boolean) {
         _uiState.update { currentState ->
@@ -38,15 +49,17 @@ class LoginActivityViewModel @Inject constructor(
     }
 
     /**
-     * State Update target to transfer verified
+     * Initiates the login process by communicating with the repository.
+     * It updates the UI state based on the result of the login attempt.
+     *
+     * @param currentId The user's identifier (username).
+     * @param password The user's password.
      */
     fun getAuraLogin(currentId: String, password: String) {
 
         viewModelScope.launch {
 
-            /**
-             * Force to wait 1 sec to display loader
-             */
+            // Simulate a delay before showing the loader
             _uiState.update { currentState ->
                 currentState.copy(
                     isUserDataReady = false,
@@ -54,16 +67,17 @@ class LoginActivityViewModel @Inject constructor(
                     errorMessage = null
                 )
             }
+
+            // Force delay to show loading spinner
             val startTime = System.currentTimeMillis()
             val elapsed = System.currentTimeMillis() - startTime
             val remainingDelay = 1000 - elapsed
             if (remainingDelay > 0) delay(remainingDelay)
 
-            /**
-             * Update stateflow in case failure, loading, success
-             */
+            // Attempt to log in and update UI state based on the result
             when (val loginUpdate = dataRepository.getLogin(currentId, password)) {
 
+                // If login fails, update state with failure message
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -75,6 +89,7 @@ class LoginActivityViewModel @Inject constructor(
                     }
                 }
 
+                // If login is in progress, keep the loader visible
                 Result.Loading -> {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -85,6 +100,7 @@ class LoginActivityViewModel @Inject constructor(
                     }
                 }
 
+                // If login is successful, update state with login success
                 is Result.Success -> {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -101,7 +117,8 @@ class LoginActivityViewModel @Inject constructor(
     }
 
     /**
-     * State Update to reset stateflow when failed
+     * Resets the UI state in case of a login failure.
+     * Clears the user data readiness, login status, and other state variables.
      */
     fun reset() {
         _uiState.update { currentState ->
@@ -114,7 +131,11 @@ class LoginActivityViewModel @Inject constructor(
 }
 
 /**
- * Data to query UserData, Logged, IsLoading and ErrorMessage
+ * Data class that represents the UI state for the login screen.
+ *
+ * Holds information about whether the user data is ready,
+ * whether the login was successful, if the screen is loading,
+ * and any error messages that may have occurred during login.
  */
 data class QueryUiState(
     val isUserDataReady: Boolean? = null,

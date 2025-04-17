@@ -13,42 +13,52 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for [HomeActivity], handles logic related to fetching and managing balance data.
+ *
+ * Uses [BankRepository] to make API calls and exposes state through [uiState] to be observed by the UI.
+ */
 @HiltViewModel
 class HomeActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository
 ) : ViewModel() {
 
     /**
-     * StateFlow to inform screen target activity
+     * Mutable backing state for UI.
      */
     private val _uiState = MutableStateFlow(QueryUiState())
+
+    /**
+     * Public immutable state observed by the UI.
+     */
     val uiState: StateFlow<QueryUiState> = _uiState.asStateFlow()
 
     /**
-     * State Update target to balance
+     * Fetches the user's balance from the repository.
+     *
+     * Updates UI state accordingly (loading, success, or failure).
+     * Includes a forced delay of 1 second to simulate or ensure UI feedback.
+     *
+     * @param currentId The ID of the currently logged-in user.
      */
     fun getAuraBalance(currentId: String) {
-
         viewModelScope.launch {
 
-            /**
-             * Force to wait 1 sec to display loader
-             */
+            // Show loading state before making the API call
             _uiState.update { currentState ->
                 currentState.copy(
                     isViewLoading = true,
                     errorMessage = null
                 )
             }
+
+            // Enforce a minimum delay of 1 second to show loader
             val startTime = System.currentTimeMillis()
             val elapsed = System.currentTimeMillis() - startTime
             val remainingDelay = 1000 - elapsed
-            if (remainingDelay > 0)
-                delay(remainingDelay)
+            if (remainingDelay > 0) delay(remainingDelay)
 
-            /**
-             * Update stateflow in case failure, loading, success
-             */
+            // Handle API response
             when (val balanceUpdate = dataRepository.getBalance(currentId)) {
 
                 is Result.Failure -> {
@@ -85,7 +95,9 @@ class HomeActivityViewModel @Inject constructor(
     }
 
     /**
-     * State Update to reset stateflow when failed
+     * Resets the balance and status in the UI state.
+     *
+     * Called typically after a failed attempt to avoid stale or inconsistent UI state.
      */
     fun reset() {
         _uiState.update { currentState ->
@@ -98,7 +110,14 @@ class HomeActivityViewModel @Inject constructor(
 }
 
 /**
- * Data to query balance, balance ready, IsLoading and ErrorMessage
+ * UI state class that holds balance, loading status, readiness state, and error messages.
+ *
+ * Used with [StateFlow] to provide observable state updates to the view.
+ *
+ * @property balance The user's current balance, if available.
+ * @property isBalanceReady Indicates whether the balance was successfully loaded.
+ * @property isViewLoading Whether a loading indicator should be shown.
+ * @property errorMessage Optional error message in case of a failure.
  */
 data class QueryUiState(
     val balance: Double? = null,

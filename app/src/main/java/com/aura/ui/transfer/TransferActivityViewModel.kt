@@ -13,20 +13,26 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
-
+/**
+ * ViewModel for the TransferActivity that handles the transfer logic.
+ * It is responsible for handling the transfer process and updating the UI state accordingly.
+ */
 @HiltViewModel
 class TransferActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository
 ) : ViewModel() {
 
     /**
-     * StateFlow to inform screen target activity
+     * StateFlow to inform the screen of the current transfer activity state.
      */
     private val _uiState = MutableStateFlow(TransferUiState())
     val uiState: StateFlow<TransferUiState> = _uiState.asStateFlow()
 
     /**
-     * State Update to inform user data verified
+     * Updates the UI state to indicate whether the user has filled in the recipient and amount fields.
+     *
+     * @param isRecipient Boolean indicating whether the recipient field is filled.
+     * @param isAmount Boolean indicating whether the amount field is filled.
      */
     fun userDataControl(isRecipient: Boolean, isAmount: Boolean) {
         _uiState.update { currentState ->
@@ -37,15 +43,18 @@ class TransferActivityViewModel @Inject constructor(
     }
 
     /**
-     * State Update target to transfer verified
+     * Initiates the transfer process by calling the repository to perform the transfer.
+     * Updates the UI state based on the result (Loading, Success, Failure).
+     *
+     * @param currentId The current user ID.
+     * @param recipient The recipient's information.
+     * @param amount The transfer amount.
      */
     fun getAuraTransfer(currentId: String, recipient: String, amount: Double) {
 
         viewModelScope.launch {
 
-            /**
-             * Force to wait 1 sec to display loader
-             */
+            // Force to wait 1 second to display the loader
             _uiState.update { currentState ->
                 currentState.copy(
                     isViewLoading = true,
@@ -57,9 +66,7 @@ class TransferActivityViewModel @Inject constructor(
             val remainingDelay = 1000 - elapsed
             if (remainingDelay > 0) delay(remainingDelay)
 
-            /**
-             * Update stateflow in case failure, loading, success
-             */
+            // Update stateflow in case of failure, loading, or success
             when (val transferUpdate = dataRepository.getTransfer(currentId, recipient, amount)) {
 
                 is Result.Failure -> {
@@ -94,7 +101,7 @@ class TransferActivityViewModel @Inject constructor(
     }
 
     /**
-     * State Update to reset stateflow when failed
+     * Resets the UI state, particularly after a failed transfer.
      */
     fun reset() {
         _uiState.update { currentState ->
@@ -107,7 +114,12 @@ class TransferActivityViewModel @Inject constructor(
 }
 
 /**
- * Data to query UserData, Transferred, IsLoading and ErrorMessage
+ * Data class representing the UI state of the transfer screen.
+ * Contains the following properties:
+ * - isUserDataReady: Boolean indicating whether the user data is valid (recipient and amount filled).
+ * - transferred: Boolean indicating whether the transfer was successful.
+ * - isViewLoading: Boolean indicating whether the transfer is in progress (loading state).
+ * - errorMessage: A string to hold any error message if an error occurs.
  */
 data class TransferUiState(
     val isUserDataReady: Boolean? = null,
