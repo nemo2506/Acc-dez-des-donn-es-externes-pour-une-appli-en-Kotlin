@@ -20,10 +20,16 @@ class LoginActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository
 ) : ViewModel() {
 
+    /**
+     * StateFlow to inform screen target activity
+     */
     private val _uiState = MutableStateFlow(QueryUiState())
     val uiState: StateFlow<QueryUiState> = _uiState.asStateFlow()
 
-    fun loginManage(identifier: Boolean, password: Boolean) {
+    /**
+     * State Update to inform user data verified
+     */
+    fun userDataControl(identifier: Boolean, password: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
                 isUserDataReady = identifier && password
@@ -31,11 +37,16 @@ class LoginActivityViewModel @Inject constructor(
         }
     }
 
+    /**
+     * State Update target to transfer verified
+     */
     fun getAuraLogin(currentId: String, password: String) {
 
         viewModelScope.launch {
 
-            // FORCE 1 sec to TEST
+            /**
+             * Force to wait 1 sec to display loader
+             */
             _uiState.update { currentState ->
                 currentState.copy(
                     isUserDataReady = false,
@@ -48,6 +59,9 @@ class LoginActivityViewModel @Inject constructor(
             val remainingDelay = 1000 - elapsed
             if (remainingDelay > 0) delay(remainingDelay)
 
+            /**
+             * Update stateflow in case failure, loading, success
+             */
             when (val loginUpdate = dataRepository.getLogin(currentId, password)) {
 
                 is Result.Failure -> {
@@ -86,6 +100,9 @@ class LoginActivityViewModel @Inject constructor(
         }
     }
 
+    /**
+     * State Update to reset stateflow when failed
+     */
     fun reset() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -96,6 +113,9 @@ class LoginActivityViewModel @Inject constructor(
     }
 }
 
+/**
+ * Data to query UserData, Logged, IsLoading and ErrorMessage
+ */
 data class QueryUiState(
     val isUserDataReady: Boolean? = null,
     val logged: Boolean? = null,

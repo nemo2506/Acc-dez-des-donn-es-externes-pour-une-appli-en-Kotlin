@@ -18,14 +18,22 @@ class HomeActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository
 ) : ViewModel() {
 
+    /**
+     * StateFlow to inform screen target activity
+     */
     private val _uiState = MutableStateFlow(QueryUiState())
     val uiState: StateFlow<QueryUiState> = _uiState.asStateFlow()
 
+    /**
+     * State Update target to balance
+     */
     fun getAuraBalance(currentId: String) {
 
         viewModelScope.launch {
 
-            // FORCE 1 sec to TEST
+            /**
+             * Force to wait 1 sec to display loader
+             */
             _uiState.update { currentState ->
                 currentState.copy(
                     isViewLoading = true,
@@ -37,6 +45,10 @@ class HomeActivityViewModel @Inject constructor(
             val remainingDelay = 1000 - elapsed
             if (remainingDelay > 0)
                 delay(remainingDelay)
+
+            /**
+             * Update stateflow in case failure, loading, success
+             */
             when (val balanceUpdate = dataRepository.getBalance(currentId)) {
 
                 is Result.Failure -> {
@@ -72,6 +84,9 @@ class HomeActivityViewModel @Inject constructor(
         }
     }
 
+    /**
+     * State Update to reset stateflow when failed
+     */
     fun reset() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -82,6 +97,9 @@ class HomeActivityViewModel @Inject constructor(
     }
 }
 
+/**
+ * Data to query balance, balance ready, IsLoading and ErrorMessage
+ */
 data class QueryUiState(
     val balance: Double? = null,
     val isBalanceReady: Boolean? = null,

@@ -1,6 +1,5 @@
 package com.aura.ui.transfer
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aura.data.repository.BankRepository
@@ -20,10 +19,16 @@ class TransferActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository
 ) : ViewModel() {
 
+    /**
+     * StateFlow to inform screen target activity
+     */
     private val _uiState = MutableStateFlow(TransferUiState())
     val uiState: StateFlow<TransferUiState> = _uiState.asStateFlow()
 
-    fun transferManage(isRecipient: Boolean, isAmount: Boolean) {
+    /**
+     * State Update to inform user data verified
+     */
+    fun userDataControl(isRecipient: Boolean, isAmount: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
                 isUserDataReady = isRecipient && isAmount
@@ -31,11 +36,16 @@ class TransferActivityViewModel @Inject constructor(
         }
     }
 
+    /**
+     * State Update target to transfer verified
+     */
     fun getAuraTransfer(currentId: String, recipient: String, amount: Double) {
 
         viewModelScope.launch {
 
-            // FORCE 1 sec to TEST
+            /**
+             * Force to wait 1 sec to display loader
+             */
             _uiState.update { currentState ->
                 currentState.copy(
                     isViewLoading = true,
@@ -47,6 +57,9 @@ class TransferActivityViewModel @Inject constructor(
             val remainingDelay = 1000 - elapsed
             if (remainingDelay > 0) delay(remainingDelay)
 
+            /**
+             * Update stateflow in case failure, loading, success
+             */
             when (val transferUpdate = dataRepository.getTransfer(currentId, recipient, amount)) {
 
                 is Result.Failure -> {
@@ -80,6 +93,9 @@ class TransferActivityViewModel @Inject constructor(
         }
     }
 
+    /**
+     * State Update to reset stateflow when failed
+     */
     fun reset() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -90,6 +106,9 @@ class TransferActivityViewModel @Inject constructor(
     }
 }
 
+/**
+ * Data to query UserData, Transferred, IsLoading and ErrorMessage
+ */
 data class TransferUiState(
     val isUserDataReady: Boolean? = null,
     val transferred: Boolean? = null,

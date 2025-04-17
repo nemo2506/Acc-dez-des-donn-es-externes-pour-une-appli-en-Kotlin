@@ -107,7 +107,7 @@ class LoginActivity : AppCompatActivity() {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         override fun afterTextChanged(s: Editable?) {
-            viewModel.loginManage(
+            viewModel.userDataControl(
                 binding.identifier.text.isNotEmpty(),
                 binding.password.text.isNotEmpty()
             )
