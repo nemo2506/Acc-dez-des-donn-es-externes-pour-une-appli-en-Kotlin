@@ -44,7 +44,7 @@ class HomeActivityViewModel @Inject constructor(
     fun getAuraBalance(currentId: String) {
         viewModelScope.launch {
 
-            // Show loading state before making the API call
+            // Simulate a delay before showing the loader
             _uiState.update { currentState ->
                 currentState.copy(
                     isViewLoading = true,
@@ -52,25 +52,26 @@ class HomeActivityViewModel @Inject constructor(
                 )
             }
 
-            // Enforce a minimum delay of 1 second to show loader
+            // Force to wait 1 second to display the loader
             val startTime = System.currentTimeMillis()
             val elapsed = System.currentTimeMillis() - startTime
             val remainingDelay = 1000 - elapsed
             if (remainingDelay > 0) delay(remainingDelay)
 
-            // Handle API response
+            // Attempt to log in and update UI state based on the result
             when (val balanceUpdate = dataRepository.getBalance(currentId)) {
 
+                // If balance fails, update state with failure message
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isBalanceReady = false,
                             isViewLoading = false,
                             errorMessage = balanceUpdate.message
                         )
                     }
                 }
 
+                // If balance is in progress, keep the loader visible
                 Result.Loading -> {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -80,10 +81,10 @@ class HomeActivityViewModel @Inject constructor(
                     }
                 }
 
+                // If balance is successful, update state with login success
                 is Result.Success -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isBalanceReady = balanceUpdate.value.balance != null,
                             balance = balanceUpdate.value.balance,
                             isViewLoading = false,
                             errorMessage = null
@@ -102,7 +103,6 @@ class HomeActivityViewModel @Inject constructor(
     fun reset() {
         _uiState.update { currentState ->
             currentState.copy(
-                isBalanceReady = null,
                 balance = null
             )
         }
@@ -115,13 +115,11 @@ class HomeActivityViewModel @Inject constructor(
  * Used with [StateFlow] to provide observable state updates to the view.
  *
  * @property balance The user's current balance, if available.
- * @property isBalanceReady Indicates whether the balance was successfully loaded.
  * @property isViewLoading Whether a loading indicator should be shown.
  * @property errorMessage Optional error message in case of a failure.
  */
 data class QueryUiState(
     val balance: Double? = null,
-    val isBalanceReady: Boolean? = null,
     val isViewLoading: Boolean? = null,
     val errorMessage: String? = null
 )

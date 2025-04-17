@@ -54,21 +54,24 @@ class TransferActivityViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            // Force to wait 1 second to display the loader
+            // Simulate a delay before showing the loader
             _uiState.update { currentState ->
                 currentState.copy(
                     isViewLoading = true,
                     errorMessage = null
                 )
             }
+
+            // Force to wait 1 second to display the loader
             val startTime = System.currentTimeMillis()
             val elapsed = System.currentTimeMillis() - startTime
             val remainingDelay = 1000 - elapsed
             if (remainingDelay > 0) delay(remainingDelay)
 
-            // Update stateflow in case of failure, loading, or success
+            // Attempt to log in and update UI state based on the result
             when (val transferUpdate = dataRepository.getTransfer(currentId, recipient, amount)) {
 
+                // If transfer fails, update state with failure message
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -79,6 +82,7 @@ class TransferActivityViewModel @Inject constructor(
                     }
                 }
 
+                // If transfer is in progress, keep the loader visible
                 Result.Loading -> {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -88,6 +92,7 @@ class TransferActivityViewModel @Inject constructor(
                     }
                 }
 
+                // If transfer is successful, update state with login success
                 is Result.Success -> {
                     _uiState.update { currentState ->
                         currentState.copy(

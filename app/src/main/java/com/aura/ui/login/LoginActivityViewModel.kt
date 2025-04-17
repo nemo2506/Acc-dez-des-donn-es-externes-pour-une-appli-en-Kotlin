@@ -68,7 +68,7 @@ class LoginActivityViewModel @Inject constructor(
                 )
             }
 
-            // Force delay to show loading spinner
+            // Force to wait 1 second to display the loader
             val startTime = System.currentTimeMillis()
             val elapsed = System.currentTimeMillis() - startTime
             val remainingDelay = 1000 - elapsed

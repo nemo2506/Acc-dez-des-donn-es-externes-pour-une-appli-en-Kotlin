@@ -19,88 +19,84 @@ import com.aura.databinding.ActivityHomeBinding
 import com.aura.ui.login.LoginActivity
 import com.aura.ui.transfer.TransferActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * The home activity for the app.
+ * The main screen shown after a successful login, displaying the user's account balance
+ * and allowing access to transfer operations.
  */
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     /**
-     * The binding for the home layout.
+     * View binding instance for accessing layout views.
      */
     private lateinit var binding: ActivityHomeBinding
+
+    /**
+     * ViewModel associated with this activity.
+     */
     private val viewModel: HomeActivityViewModel by viewModels()
+
+    /**
+     * The current user's identifier, passed from the login screen.
+     */
     private lateinit var currentId: String
 
     /**
-     * A callback for the result of starting the TransferActivity.
+     * Callback to handle results from [TransferActivity].
      */
     private val startTransferActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            //TODO
+            // TODO: Handle transfer result if needed
         }
 
+    /**
+     * Called when the activity is starting. Initializes the UI and observers.
+     */
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         currentId = intent.getStringExtra("currentId").toString()
-
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         val balance = binding.balance
         val loading = binding.loading
         val transfer = binding.transfer
         val retry = binding.retry
 
-        /**
-         * Get Balance by loading or by clicking
-         */
+        // Trigger balance fetch initially and on retry button click
         viewModel.getAuraBalance(currentId)
-        retry.setOnClickListener() {
+        retry.setOnClickListener {
             viewModel.getAuraBalance(currentId)
         }
 
-        /**
-         * When button Transfer is clicked TransferActivity is loading
-         */
+        // Launch transfer screen when the transfer button is clicked
         transfer.setOnClickListener {
             startTransferActivityForResult.launch(
-                Intent(this, TransferActivity::class.java)
-                    .putExtra("currentId", currentId)
+                Intent(this, TransferActivity::class.java).putExtra("currentId", currentId)
             )
         }
 
-        /**
-         * Scope to viewModel to interactivity
-         */
+        // Observe ViewModel state updates using lifecycle-aware coroutine scope
         lifecycleScope.launch {
-
             viewModel.uiState.collect {
 
-                /**
-                 * Interface Loader visibility and Button enabled depends to scope interactivity
-                 */
+                Log.d("MARC", "it.isBalanceReady: $it")
+                // Control UI loading and retry states
                 loading.isVisible = it.isViewLoading == true
-                retry.isVisible = it.isBalanceReady == false
+                retry.isVisible = it.balance == null
 
-                /**
-                 * At step balance ready it's displaying to screen
-                 */
-                if (it.isBalanceReady == true) {
+                // Show balance if available
+                if (it.balance != null) {
                     balance.text = "%.2f€".format(it.balance)
                     toastMessage(getString(R.string.balance_success))
                 }
 
-                /**
-                 * At step not balance stateflow is reset
-                 */
-                if (it.isBalanceReady == false) {
+                // Reset state if balance fetch fails
+                if (it.balance == null) {
                     viewModel.reset()
                     toastMessage(getString(R.string.balance_failed))
                 }
@@ -108,11 +104,20 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Inflates the menu defined in `home_menu.xml`.
+     */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.home_menu, menu)
         return true
     }
 
+    /**
+     * Handles menu item selections.
+     *
+     * @param item The selected menu item.
+     * @return True if the action was handled.
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.disconnect -> {
@@ -120,13 +125,14 @@ class HomeActivity : AppCompatActivity() {
                 finish()
                 true
             }
-
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     /**
-     * Simplify methode to screen message
+     * Shows a short toast message on screen.
+     *
+     * @param message The message to display.
      */
     private fun toastMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
