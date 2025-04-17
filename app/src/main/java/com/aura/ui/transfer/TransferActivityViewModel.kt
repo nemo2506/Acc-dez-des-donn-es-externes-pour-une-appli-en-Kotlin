@@ -112,7 +112,8 @@ class TransferActivityViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 isUserDataReady = null,
-                transferred = null
+                transferred = null,
+                errorMessage = null
             )
         }
     }

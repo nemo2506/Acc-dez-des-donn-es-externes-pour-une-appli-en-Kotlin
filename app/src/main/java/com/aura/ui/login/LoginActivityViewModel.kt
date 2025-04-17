@@ -124,7 +124,8 @@ class LoginActivityViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 isUserDataReady = null,
-                logged = null
+                logged = null,
+                errorMessage = null
             )
         }
     }

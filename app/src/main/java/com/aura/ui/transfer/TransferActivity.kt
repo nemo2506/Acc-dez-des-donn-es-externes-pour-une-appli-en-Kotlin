@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -72,9 +73,11 @@ class TransferActivity : AppCompatActivity() {
 
             viewModel.uiState.collect {
 
+                Log.d("MARC", "it: $it")
+
                 // Show loading indicator and disable transfer button while loading
                 loading.isVisible = it.isViewLoading == true
-                transfer.isEnabled = it.transferred == true || it.isUserDataReady == true
+                transfer.isEnabled = it.transferred == false || it.isUserDataReady == true
 
                 // If the transfer is successful, navigate to HomeActivity
                 if (it.transferred == true) {

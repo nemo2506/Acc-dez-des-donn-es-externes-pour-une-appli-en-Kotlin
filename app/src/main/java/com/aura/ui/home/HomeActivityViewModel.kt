@@ -65,6 +65,7 @@ class HomeActivityViewModel @Inject constructor(
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
+                            isBalanceReady= false,
                             isViewLoading = false,
                             errorMessage = balanceUpdate.message
                         )
@@ -85,6 +86,7 @@ class HomeActivityViewModel @Inject constructor(
                 is Result.Success -> {
                     _uiState.update { currentState ->
                         currentState.copy(
+                            isBalanceReady= true,
                             balance = balanceUpdate.value.balance,
                             isViewLoading = false,
                             errorMessage = null
@@ -103,7 +105,9 @@ class HomeActivityViewModel @Inject constructor(
     fun reset() {
         _uiState.update { currentState ->
             currentState.copy(
-                balance = null
+                balance = null,
+                isBalanceReady = null,
+                errorMessage = null
             )
         }
     }
@@ -120,6 +124,7 @@ class HomeActivityViewModel @Inject constructor(
  */
 data class QueryUiState(
     val balance: Double? = null,
+    val isBalanceReady: Boolean? = null,
     val isViewLoading: Boolean? = null,
     val errorMessage: String? = null
 )

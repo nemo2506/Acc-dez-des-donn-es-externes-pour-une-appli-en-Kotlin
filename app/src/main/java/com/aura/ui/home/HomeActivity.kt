@@ -1,10 +1,8 @@
 package com.aura.ui.home
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -84,19 +82,18 @@ class HomeActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState.collect {
 
-                Log.d("MARC", "it.isBalanceReady: $it")
                 // Control UI loading and retry states
                 loading.isVisible = it.isViewLoading == true
                 retry.isVisible = it.balance == null
 
                 // Show balance if available
-                if (it.balance != null) {
+                if (it.isBalanceReady == true) {
                     balance.text = "%.2f€".format(it.balance)
                     toastMessage(getString(R.string.balance_success))
                 }
 
                 // Reset state if balance fetch fails
-                if (it.balance == null) {
+                if (it.isBalanceReady == false) {
                     viewModel.reset()
                     toastMessage(getString(R.string.balance_failed))
                 }
