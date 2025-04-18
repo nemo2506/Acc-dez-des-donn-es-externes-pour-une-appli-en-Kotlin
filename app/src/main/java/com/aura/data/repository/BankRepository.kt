@@ -30,7 +30,6 @@ class BankRepository @Inject constructor(
      */
     suspend fun getLogin(id: String, password: String): Result<LoginReportModel> {
         return try {
-            Result.Loading
             val user = User(id, password)
             val result = dataService.fetchAccess(user)
             val model = result.body()?.toDomainModel() ?: throw Exception("Invalid data")
@@ -49,7 +48,6 @@ class BankRepository @Inject constructor(
      */
     suspend fun getBalance(currentId: String): Result<BalanceReportModel> {
         return try {
-            Result.Loading
             val result = dataService.fetchBalance(currentId)
             val list = result.body() ?: throw Exception("Invalid data")
             val accounts: List<Account> = list.map { it.toDomainModel() }
@@ -75,7 +73,6 @@ class BankRepository @Inject constructor(
         amount: Double
     ): Result<TransferReportModel> {
         return try {
-            Result.Loading
             val transfer = Transfer(currentId, recipient, amount)
             val result = dataService.fetchTransfer(transfer)
             val model = result.body()?.toDomainModel() ?: throw Exception("Invalid data")
