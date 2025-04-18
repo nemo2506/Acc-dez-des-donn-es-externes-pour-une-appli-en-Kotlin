@@ -79,16 +79,6 @@ class TransferActivityViewModel @Inject constructor(
                     }
                 }
 
-                // If transfer is in progress, keep the loader visible
-                Result.Loading -> {
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            isViewLoading = true,
-                            transferred = null
-                        )
-                    }
-                }
-
                 // If transfer is successful, update state with login success
                 is Result.Success -> {
                     _uiState.update { currentState ->

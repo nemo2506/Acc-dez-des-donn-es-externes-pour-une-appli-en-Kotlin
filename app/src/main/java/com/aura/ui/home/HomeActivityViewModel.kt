@@ -69,16 +69,6 @@ class HomeActivityViewModel @Inject constructor(
                     }
                 }
 
-                // If balance is in progress, keep the loader visible
-                Result.Loading -> {
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            isViewLoading = true,
-                            errorMessage = null
-                        )
-                    }
-                }
-
                 // If balance is successful, update state with login success
                 is Result.Success -> {
                     _uiState.update { currentState ->

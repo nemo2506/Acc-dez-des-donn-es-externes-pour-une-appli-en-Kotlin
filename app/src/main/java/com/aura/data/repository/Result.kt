@@ -12,11 +12,6 @@ package com.aura.data.repository
 sealed class Result<out T> {
 
     /**
-     * Represents a loading state, typically used while waiting for a response.
-     */
-    object Loading : Result<Nothing>()
-
-    /**
      * Represents a failure state with an optional error [message].
      *
      * @property message An optional description of the error.

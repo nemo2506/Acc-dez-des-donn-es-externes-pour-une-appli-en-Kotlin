@@ -85,17 +85,6 @@ class LoginActivityViewModel @Inject constructor(
                     }
                 }
 
-                // If login is in progress, keep the loader visible
-                Result.Loading -> {
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            isUserDataReady = false,
-                            isViewLoading = true,
-                            errorMessage = null
-                        )
-                    }
-                }
-
                 // If login is successful, update state with login success
                 is Result.Success -> {
                     _uiState.update { currentState ->
