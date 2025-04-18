@@ -63,10 +63,7 @@ class TransferActivityViewModel @Inject constructor(
             }
 
             // Force to wait 1 second to display the loader
-            val startTime = System.currentTimeMillis()
-            val elapsed = System.currentTimeMillis() - startTime
-            val remainingDelay = 1000 - elapsed
-            if (remainingDelay > 0) delay(remainingDelay)
+            delay(1000)
 
             // Attempt to log in and update UI state based on the result
             when (val transferUpdate = dataRepository.getTransfer(currentId, recipient, amount)) {
