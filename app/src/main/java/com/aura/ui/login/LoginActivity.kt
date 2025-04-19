@@ -24,6 +24,17 @@ import com.aura.R
  */
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
+    /**
+     * User login activity.
+     *
+     * This activity allows the user to log in and, upon successful authentication,
+     * navigates to [HomeActivity], passing the user's ID via an Intent.
+     *
+     * @property CURRENT_ID Constant key used to pass the user ID through an Intent.
+     */
+    companion object {
+        const val CURRENT_ID: String = "currentId"
+    }
 
     private val viewModel: LoginActivityViewModel by viewModels()
 
@@ -32,9 +43,6 @@ class LoginActivity : AppCompatActivity() {
      */
     private lateinit var binding: ActivityLoginBinding
 
-    companion object {
-        const val CURRENT_ID: String = "currentId"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
