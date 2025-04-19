@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.aura.R
 import com.aura.databinding.ActivityTransferBinding
 import com.aura.ui.home.HomeActivity
+import com.aura.ui.login.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -42,7 +43,7 @@ class TransferActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Retrieve the user ID passed from the previous screen (HomeActivity)
-        currentId = intent.getStringExtra("currentId").toString()
+        currentId = intent.getStringExtra(LoginActivity.CURRENT_ID).toString()
 
         // Inflate the layout using the binding object
         binding = ActivityTransferBinding.inflate(layoutInflater)
@@ -105,7 +106,7 @@ class TransferActivity : AppCompatActivity() {
      */
     private fun homeLoader() {
         startActivity(Intent(this, HomeActivity::class.java)
-            .apply { putExtra("currentId", currentId) })
+            .apply { putExtra(LoginActivity.CURRENT_ID, currentId) })
         finish()
     }
 

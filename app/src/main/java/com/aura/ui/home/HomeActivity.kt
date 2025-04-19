@@ -56,7 +56,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        currentId = intent.getStringExtra("currentId").toString()
+        currentId = intent.getStringExtra(LoginActivity.CURRENT_ID).toString()
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -74,7 +74,7 @@ class HomeActivity : AppCompatActivity() {
         // Launch transfer screen when the transfer button is clicked
         transfer.setOnClickListener {
             startTransferActivityForResult.launch(
-                Intent(this, TransferActivity::class.java).putExtra("currentId", currentId)
+                Intent(this, TransferActivity::class.java).putExtra(LoginActivity.CURRENT_ID, currentId)
             )
         }
 

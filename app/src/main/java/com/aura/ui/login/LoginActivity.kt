@@ -32,6 +32,10 @@ class LoginActivity : AppCompatActivity() {
      */
     private lateinit var binding: ActivityLoginBinding
 
+    companion object {
+        const val CURRENT_ID: String = "currentId"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -94,7 +98,7 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun homeLoader(currentId: EditText) {
         val intent = Intent(this, HomeActivity::class.java).apply {
-            putExtra("currentId", currentId.text.toString())
+            putExtra(CURRENT_ID, currentId.text.toString())
         }
         startActivity(intent)
         finish()
