@@ -1,6 +1,7 @@
 package com.aura.di
 
 import com.aura.data.network.ManageClient
+import com.aura.ui.ConstantsApp
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -31,7 +32,7 @@ object NetworkModule {
     @Provides
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://192.168.1.17:8080")
+            .baseUrl(ConstantsApp.API_URL)
             .addConverterFactory(
                 MoshiConverterFactory.create(
                     Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
