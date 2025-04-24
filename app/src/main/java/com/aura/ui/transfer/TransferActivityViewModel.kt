@@ -1,9 +1,12 @@
 package com.aura.ui.transfer
 
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aura.data.repository.BankRepository
 import com.aura.data.repository.Result
+import com.aura.ui.ConstantsApp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,8 +22,19 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TransferActivityViewModel @Inject constructor(
-    private val dataRepository: BankRepository
+    private val dataRepository: BankRepository,
+    appState: SavedStateHandle
 ) : ViewModel() {
+
+    /**
+     * Retrieves the current ID stored in the application state.
+     *
+     * The ID is fetched using the key defined in [ConstantsApp.CURRENT_ID] and is
+     * cast to a [String]. The `toString()` call ensures the result is a non-nullable string.
+     *
+     * @see ConstantsApp.CURRENT_ID for the key used to retrieve the value.
+     */
+    val currentId: String = appState.get<String>(ConstantsApp.CURRENT_ID).toString()
 
     /**
      * StateFlow to inform the screen of the current transfer activity state.
@@ -46,11 +60,12 @@ class TransferActivityViewModel @Inject constructor(
      * Initiates the transfer process by calling the repository to perform the transfer.
      * Updates the UI state based on the result (Loading, Success, Failure).
      *
-     * @param currentId The current user ID.
      * @param recipient The recipient's information.
      * @param amount The transfer amount.
      */
-    fun getAuraTransfer(currentId: String, recipient: String, amount: Double) {
+    fun getAuraTransfer(recipient: String, amount: Double) {
+
+        Log.d("MARC", "getAuraTransfer: currentId=$currentId")
 
         viewModelScope.launch {
 

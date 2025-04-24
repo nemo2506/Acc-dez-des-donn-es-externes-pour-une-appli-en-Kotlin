@@ -1,9 +1,12 @@
 package com.aura.ui.home
 
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aura.data.repository.BankRepository
 import com.aura.data.repository.Result
+import com.aura.ui.ConstantsApp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +23,19 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeActivityViewModel @Inject constructor(
-    private val dataRepository: BankRepository
+    private val dataRepository: BankRepository,
+    appState: SavedStateHandle
 ) : ViewModel() {
+
+    /**
+     * Retrieves the current ID stored in the application state.
+     *
+     * The ID is fetched using the key defined in [ConstantsApp.CURRENT_ID] and is
+     * cast to a [String]. The `toString()` call ensures the result is a non-nullable string.
+     *
+     * @see ConstantsApp.CURRENT_ID for the key used to retrieve the value.
+     */
+    val currentId: String = appState.get<String>(ConstantsApp.CURRENT_ID).toString()
 
     /**
      * Mutable backing state for UI.
@@ -39,9 +53,11 @@ class HomeActivityViewModel @Inject constructor(
      * Updates UI state accordingly (loading, success, or failure).
      * Includes a forced delay of 1 second to simulate or ensure UI feedback.
      *
-     * @param currentId The ID of the currently logged-in user.
      */
-    fun getAuraBalance(currentId: String) {
+    fun getAuraBalance() {
+
+        Log.d("MARC", "getAuraBalance: currentId=$currentId")
+
         viewModelScope.launch {
 
             // Simulate a delay before showing the loader
@@ -62,7 +78,7 @@ class HomeActivityViewModel @Inject constructor(
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isBalanceReady= false,
+                            isBalanceReady = false,
                             isViewLoading = false,
                             errorMessage = balanceUpdate.message
                         )
@@ -73,7 +89,7 @@ class HomeActivityViewModel @Inject constructor(
                 is Result.Success -> {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isBalanceReady= true,
+                            isBalanceReady = true,
                             balance = balanceUpdate.value.balance,
                             isViewLoading = false,
                             errorMessage = null

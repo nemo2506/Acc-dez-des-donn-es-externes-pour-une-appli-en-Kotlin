@@ -12,8 +12,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.aura.R
 import com.aura.databinding.ActivityTransferBinding
+import com.aura.ui.ConstantsApp
 import com.aura.ui.home.HomeActivity
-import com.aura.ui.login.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -42,9 +42,6 @@ class TransferActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Retrieve the user ID passed from the previous screen (HomeActivity)
-        currentId = intent.getStringExtra(LoginActivity.CURRENT_ID).toString()
-
         // Inflate the layout using the binding object
         binding = ActivityTransferBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -63,7 +60,6 @@ class TransferActivity : AppCompatActivity() {
         transfer.setOnClickListener {
             // Call ViewModel method to handle transfer logic
             viewModel.getAuraTransfer(
-                currentId,
                 recipient.text.toString(),
                 amount.text.toString().toDouble()
             )
@@ -73,8 +69,6 @@ class TransferActivity : AppCompatActivity() {
         lifecycleScope.launch {
 
             viewModel.uiState.collect {
-
-                Log.d("MARC", "it: $it")
 
                 // Show loading indicator and disable transfer button while loading
                 loading.isVisible = it.isViewLoading == true
@@ -106,7 +100,7 @@ class TransferActivity : AppCompatActivity() {
      */
     private fun homeLoader() {
         startActivity(Intent(this, HomeActivity::class.java)
-            .apply { putExtra(LoginActivity.CURRENT_ID, currentId) })
+            .apply { putExtra(ConstantsApp.CURRENT_ID, viewModel.currentId) })
         finish()
     }
 

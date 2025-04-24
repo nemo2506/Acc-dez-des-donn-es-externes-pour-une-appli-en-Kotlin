@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import com.aura.R
+import com.aura.ui.ConstantsApp
 
 /**
  * Activity responsible for handling user login.
@@ -24,17 +25,6 @@ import com.aura.R
  */
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
-    /**
-     * User login activity.
-     *
-     * This activity allows the user to log in and, upon successful authentication,
-     * navigates to [HomeActivity], passing the user's ID via an Intent.
-     *
-     * @property CURRENT_ID Constant key used to pass the user ID through an Intent.
-     */
-    companion object {
-        const val CURRENT_ID: String = "currentId"
-    }
 
     private val viewModel: LoginActivityViewModel by viewModels()
 
@@ -106,7 +96,7 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun homeLoader(currentId: EditText) {
         val intent = Intent(this, HomeActivity::class.java).apply {
-            putExtra(CURRENT_ID, currentId.text.toString())
+            putExtra(ConstantsApp.CURRENT_ID, currentId.text.toString())
         }
         startActivity(intent)
         finish()

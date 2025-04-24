@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.aura.R
 import com.aura.databinding.ActivityHomeBinding
+import com.aura.ui.ConstantsApp
 import com.aura.ui.login.LoginActivity
 import com.aura.ui.transfer.TransferActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,11 +38,6 @@ class HomeActivity : AppCompatActivity() {
     private val viewModel: HomeActivityViewModel by viewModels()
 
     /**
-     * The current user's identifier, passed from the login screen.
-     */
-    private lateinit var currentId: String
-
-    /**
      * Callback to handle results from [TransferActivity].
      */
     private val startTransferActivityForResult =
@@ -56,7 +52,6 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        currentId = intent.getStringExtra(LoginActivity.CURRENT_ID).toString()
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -66,15 +61,16 @@ class HomeActivity : AppCompatActivity() {
         val retry = binding.retry
 
         // Trigger balance fetch initially and on retry button click
-        viewModel.getAuraBalance(currentId)
+        viewModel.getAuraBalance()
         retry.setOnClickListener {
-            viewModel.getAuraBalance(currentId)
+            viewModel.getAuraBalance()
         }
 
         // Launch transfer screen when the transfer button is clicked
         transfer.setOnClickListener {
             startTransferActivityForResult.launch(
-                Intent(this, TransferActivity::class.java).putExtra(LoginActivity.CURRENT_ID, currentId)
+                Intent(this, TransferActivity::class.java)
+                    .putExtra(ConstantsApp.CURRENT_ID, viewModel.currentId)
             )
         }
 
