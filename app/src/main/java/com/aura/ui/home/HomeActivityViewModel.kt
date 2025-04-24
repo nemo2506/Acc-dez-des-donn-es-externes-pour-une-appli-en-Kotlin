@@ -56,8 +56,6 @@ class HomeActivityViewModel @Inject constructor(
      */
     fun getAuraBalance() {
 
-        Log.d("MARC", "getAuraBalance: currentId=$currentId")
-
         viewModelScope.launch {
 
             // Simulate a delay before showing the loader

@@ -65,8 +65,6 @@ class TransferActivityViewModel @Inject constructor(
      */
     fun getAuraTransfer(recipient: String, amount: Double) {
 
-        Log.d("MARC", "getAuraTransfer: currentId=$currentId")
-
         viewModelScope.launch {
 
             // Simulate a delay before showing the loader
