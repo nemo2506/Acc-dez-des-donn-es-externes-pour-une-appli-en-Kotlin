@@ -4,10 +4,10 @@ import com.aura.data.network.ManageClient
 import com.aura.data.response.AccountBankResponse
 import com.aura.data.response.LoginBankResponse
 import com.aura.data.response.TransferBankResponse
+import com.aura.domain.model.BalanceReportModel
 import com.aura.domain.model.LoginReportModel
 import com.aura.domain.model.TransferReportModel
 import io.mockk.coEvery
-import io.mockk.core.ValueClassSupport.boxedValue
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -39,32 +39,33 @@ class BankRepositoryTest {
         } returns Response.success(loginResponse)
 
         //when
-        val value = run {
-            cut.getLogin("1234", "p@sswOrd")
+        val result = run {
+            cut.getLogin("identifier", "password")
         }
         //then
-        assertEquals(Result.Success(LoginReportModel(granted = true)), value)
+        assertEquals(Result.Success(LoginReportModel(granted = true)), result)
     }
 
     @Test
     fun `assert when getBalance is requested then clean data is provided`() = runTest {
-        //given
-        val accountResponse = AccountBankResponse(
-            id = "1234",
-            main = true,
-            balance = 100.0
+        // Given
+        val accountResponse = listOf(
+            AccountBankResponse(
+                id = "1234",
+                main = true,
+                balance = 100.0
+            )
         )
 
         coEvery {
             dataService.fetchBalance(any())
         } returns Response.success(accountResponse)
 
-        //when
-        val value = run {
-            cut.getLogin("1234", "p@sswOrd")
-        }
-        //then
-        assertEquals(Result.Success(LoginReportModel(granted = true)), value)
+        // When
+        val result = cut.getBalance("1234")
+
+        // Then
+        assertEquals(Result.Success(BalanceReportModel(100.0)), result)
     }
 
     @Test
@@ -79,11 +80,11 @@ class BankRepositoryTest {
         } returns Response.success(transferResponse)
 
         //when
-        val value = run {
+        val result = run {
             cut.getTransfer("1234", "5678", amount = 100.0)
         }
         //then
-        assertEquals(Result.Success(TransferReportModel(done = true)), value)
+        assertEquals(Result.Success(TransferReportModel(done = true)), result)
     }
 }
 
