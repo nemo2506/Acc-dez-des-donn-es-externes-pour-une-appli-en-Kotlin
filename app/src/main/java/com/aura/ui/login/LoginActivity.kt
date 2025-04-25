@@ -9,13 +9,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.aura.databinding.ActivityLoginBinding
-import com.aura.ui.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import com.aura.R
 import com.aura.ui.ConstantsApp
+import com.aura.ui.home.HomeActivity
 
 /**
  * Activity responsible for handling user login.

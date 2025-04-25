@@ -1,12 +1,10 @@
 package com.aura.ui.login
 
-import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aura.data.repository.BankRepository
 import com.aura.data.repository.Result
-import com.aura.ui.ConstantsApp
+import com.aura.domain.model.LoginReportModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -73,7 +71,7 @@ class LoginActivityViewModel @Inject constructor(
             delay(1000)
 
             // Attempt to log in and update UI state based on the result
-            when (val loginUpdate = dataRepository.getLogin(currentId, password)) {
+            when (val loginUpdate: Result<LoginReportModel> = dataRepository.getLogin(currentId, password)) {
 
                 // If login fails, update state with failure message
                 is Result.Failure -> {

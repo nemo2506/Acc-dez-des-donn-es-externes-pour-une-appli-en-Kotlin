@@ -5,7 +5,7 @@ package com.aura.domain.model
  *
  * @property granted Indicates whether access was successfully granted.
  */
-data class LoginReportModel(val granted: Boolean)
+data class LoginReportModel(val granted: Boolean?)
 
 /**
  * Represents the balance report for a user account.
