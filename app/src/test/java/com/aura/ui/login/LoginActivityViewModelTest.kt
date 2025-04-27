@@ -16,11 +16,12 @@ import org.junit.Test
 class LoginActivityViewModelTest {
 
     private lateinit var dataRepository: BankRepository
-//    private val testDispatcher = StandardTestDispatcher()
+    private lateinit var cut: LoginActivityViewModel
 
     @Before
-    fun setup() {
-        dataRepository = mockk<BankRepository>()
+    fun setUp() {
+        dataRepository = mockk()
+        cut = LoginActivityViewModel(dataRepository)
     }
 
     @Test
@@ -31,7 +32,6 @@ class LoginActivityViewModelTest {
     fun `test userDataControl with empty identifier and empty password`() = runTest {
         val identifier = ""
         val password = ""
-        val cut = LoginActivityViewModel(dataRepository)
         cut.userDataControl(identifier.isNotEmpty(), password.isNotEmpty())
         val uiState = cut.uiState.value
         uiState.isUserDataReady?.let { assertFalse(it) }
@@ -41,7 +41,6 @@ class LoginActivityViewModelTest {
     fun `test userDataControl with existed identifier and empty password`() = runTest {
         val identifier = "i"
         val password = ""
-        val cut = LoginActivityViewModel(dataRepository)
         cut.userDataControl(identifier.isNotEmpty(), password.isNotEmpty())
         val uiState = cut.uiState.value
         uiState.isUserDataReady?.let { assertFalse(it) }
@@ -51,7 +50,6 @@ class LoginActivityViewModelTest {
     fun `test userDataControl with empty identifier and existed password`() = runTest {
         val identifier = ""
         val password = "p"
-        val cut = LoginActivityViewModel(dataRepository)
         cut.userDataControl(identifier.isNotEmpty(), password.isNotEmpty())
         val uiState = cut.uiState.value
         uiState.isUserDataReady?.let { assertFalse(it) }
@@ -61,7 +59,6 @@ class LoginActivityViewModelTest {
     fun `test userDataControl with existed identifier and existed password`() = runTest {
         val identifier = "i"
         val password = "p"
-        val cut = LoginActivityViewModel(dataRepository)
         cut.userDataControl(identifier.isNotEmpty(), password.isNotEmpty())
         val uiState = cut.uiState.value
         uiState.isUserDataReady?.let { assertTrue(it) }
@@ -73,9 +70,6 @@ class LoginActivityViewModelTest {
 
     @Test
     fun `test reset clears the UI state`() = runTest {
-        // Create the ViewModel instance
-        val cut = LoginActivityViewModel(dataRepository)
-
         // Set some initial values in the UI state
         cut._uiState.update {
             it.copy(
