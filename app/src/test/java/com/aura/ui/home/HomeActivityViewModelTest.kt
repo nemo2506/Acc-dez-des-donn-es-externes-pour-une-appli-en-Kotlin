@@ -22,6 +22,7 @@ class HomeActivityViewModelTest {
 
     private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var dataRepository: BankRepository
+    private lateinit var cut: HomeActivityViewModel
 //    private val testDispatcher = StandardTestDispatcher()
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,6 +30,7 @@ class HomeActivityViewModelTest {
     fun setup() {
         dataRepository = mockk<BankRepository>()
         savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
+        cut = HomeActivityViewModel(dataRepository, savedStateHandle)
 //        Dispatchers.setMain(testDispatcher)
     }
 
@@ -38,6 +40,16 @@ class HomeActivityViewModelTest {
 //        // Reset the main dispatcher after the test
 //        Dispatchers.resetMain()
 //    }
+
+    @Test
+    fun `test initial uiState is default`() = runTest {
+        val uiState = cut.uiState.value
+
+        assertNull(uiState.isBalanceReady)
+        assertNull(uiState.balance)
+        assertNull(uiState.isViewLoading)
+        assertNull(uiState.errorMessage)
+    }
 
     @Test
     fun `test currentId initialization from SavedStateHandle`() {

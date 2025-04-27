@@ -1,11 +1,10 @@
 package com.aura.ui.login
 
-import androidx.lifecycle.SavedStateHandle
 import com.aura.data.repository.BankRepository
-import com.aura.ui.ConstantsApp
-import io.mockk.every
+import com.aura.data.repository.Result
+import com.aura.domain.model.LoginReportModel
+import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.stackTracesAlignmentValueOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -25,7 +24,13 @@ class LoginActivityViewModelTest {
     }
 
     @Test
-    fun getUiState() {
+    fun `test initial uiState is default`() = runTest {
+        val uiState = cut.uiState.value
+
+        assertNull(uiState.isUserDataReady)
+        assertNull(uiState.logged)
+        assertFalse(uiState.isViewLoading)
+        assertNull(uiState.errorMessage)
     }
 
     @Test
@@ -64,9 +69,46 @@ class LoginActivityViewModelTest {
         uiState.isUserDataReady?.let { assertTrue(it) }
     }
 
-    @Test
-    fun getAuraLogin() {
-    }
+//    @Test
+//    fun `test getAuraLogin success updates logged true`() = runTest {
+//        // Given
+//        val testId = "testuser"
+//        val testPassword = "testpass"
+//
+//        coEvery { dataRepository.getLogin(testId, testPassword) } returns
+//                Result.Success(LoginReportModel(granted = true))
+//
+//        // When
+//        cut.getAuraLogin(testId, testPassword)
+//
+//        // Then
+//        val uiState = cut.uiState.value
+//        assertEquals(false, uiState.isUserDataReady)
+//        assertEquals(false, uiState.isViewLoading)
+//        assertTrue(uiState.logged == true)
+//        assertNull(uiState.errorMessage)
+//    }
+
+//    @Test
+//    fun `test getAuraLogin failure updates errorMessage`() = runTest {
+//        // Given
+//        val testId = "wronguser"
+//        val testPassword = "wrongpass"
+//        val errorMessage = "Invalid credentials"
+//
+//        coEvery { dataRepository.getLogin(testId, testPassword) } returns
+//                Result.Failure(errorMessage)
+//
+//        // When
+//        cut.getAuraLogin(testId, testPassword)
+//
+//        // Then
+//        val uiState = cut.uiState.value
+//        assertEquals(false, uiState.isUserDataReady)
+//        assertEquals(false, uiState.isViewLoading)
+//        assertEquals(false, uiState.logged)
+//        assertEquals(errorMessage, uiState.errorMessage)
+//    }
 
     @Test
     fun `test reset clears the UI state`() = runTest {
