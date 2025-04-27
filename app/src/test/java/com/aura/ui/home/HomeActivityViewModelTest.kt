@@ -1,6 +1,5 @@
 package com.aura.ui.home
 
-import android.util.Log
 import com.aura.data.repository.Result
 import androidx.lifecycle.SavedStateHandle
 import com.aura.data.repository.BankRepository
