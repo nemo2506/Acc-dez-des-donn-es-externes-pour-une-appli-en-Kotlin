@@ -1,6 +1,5 @@
 package com.aura.ui.transfer
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,7 +38,7 @@ class TransferActivityViewModel @Inject constructor(
     /**
      * StateFlow to inform the screen of the current transfer activity state.
      */
-    private val _uiState = MutableStateFlow(TransferUiState())
+    val _uiState = MutableStateFlow(TransferUiState())
     val uiState: StateFlow<TransferUiState> = _uiState.asStateFlow()
 
     /**

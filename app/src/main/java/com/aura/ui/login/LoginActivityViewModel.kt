@@ -30,7 +30,7 @@ class LoginActivityViewModel @Inject constructor(
      * It holds information such as whether user data is ready, whether the login is successful,
      * and any error messages encountered.
      */
-    private val _uiState = MutableStateFlow(QueryUiState())
+    val _uiState = MutableStateFlow(QueryUiState())
     val uiState: StateFlow<QueryUiState> = _uiState.asStateFlow()
 
     /**
