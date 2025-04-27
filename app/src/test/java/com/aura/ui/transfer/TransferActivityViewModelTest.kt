@@ -28,6 +28,11 @@ class TransferActivityViewModelTest {
     }
 
     @Test
+    fun `test currentId initialized correctly from SavedStateHandle`() {
+        assertEquals("testCurrentId", cut.currentId)
+    }
+
+    @Test
     fun `test initial uiState is default`() {
         val uiState = cut.uiState.value
 
@@ -37,9 +42,6 @@ class TransferActivityViewModelTest {
         assertNull(uiState.errorMessage)
     }
 
-    @Test
-    fun getCurrentId() {
-    }
 
     @Test
     fun `test userDataControl with empty recipient and empty amount`() = runTest {

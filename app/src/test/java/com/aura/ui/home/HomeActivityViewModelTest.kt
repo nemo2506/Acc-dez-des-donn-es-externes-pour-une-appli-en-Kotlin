@@ -29,7 +29,7 @@ class HomeActivityViewModelTest {
     @Before
     fun setup() {
         dataRepository = mockk<BankRepository>()
-        savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
+        savedStateHandle = SavedStateHandle(mapOf(ConstantsApp.CURRENT_ID to "testCurrentId"))
         cut = HomeActivityViewModel(dataRepository, savedStateHandle)
 //        Dispatchers.setMain(testDispatcher)
     }
@@ -40,6 +40,11 @@ class HomeActivityViewModelTest {
 //        // Reset the main dispatcher after the test
 //        Dispatchers.resetMain()
 //    }
+
+    @Test
+    fun `test currentId initialized correctly from SavedStateHandle`() {
+        assertEquals("testCurrentId", cut.currentId)
+    }
 
     @Test
     fun `test initial uiState is default`() = runTest {
