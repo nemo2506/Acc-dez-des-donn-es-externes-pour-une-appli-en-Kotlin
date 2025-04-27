@@ -1,6 +1,9 @@
 package com.aura.data.network
 
+import com.aura.data.response.AccountBankResponse
 import com.aura.data.response.LoginBankResponse
+import com.aura.data.response.TransferBankResponse
+import com.aura.domain.model.Transfer
 import com.aura.domain.model.User
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -61,45 +64,46 @@ class ManageClientTest {
         assert(logged == true)
     }
 
-//    @Test
-//    fun `test fetchBalance returns AccountBankResponse on success`() = runBlocking {
-//        // Arrange: Set up MockWebServer to return a success response
-//        val balanceResponse = """
-//            [
-//                {
-//                    "id": "1",
-//                    "main": true,
-//                    "balance": 1000.0
-//                }
-//            ]
-//        """
-//        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(balanceResponse))
-//
-//        // Act: Make API call using the mock
-//        val response: Response<List<AccountBankResponse>> = manageClient.fetchBalance("12345")
-//        val account = response.body()?.first()
-//
-//        // Assert: Check if the response is successful and contains the correct data
-//        assert(response.isSuccessful)
-//        assert(account?.balance == 1000.0)
-//    }
+    @Test
+    fun `test fetchBalance returns AccountBankResponse on success`() = runBlocking {
+        // Arrange: Set up MockWebServer to return a success response
+        val balanceResponse = """
+            [
+                {
+                    "id": "1",
+                    "main": true,
+                    "balance": 1000.0
+                }
+            ]
+        """
+        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(balanceResponse))
 
-//    @Test
-//    fun `test fetchTransfer returns TransferBankResponse on success`() = runBlocking {
-//        // Arrange: Set up MockWebServer to return a success response
-//        val transferResponse = """
-//            {
-//                "result": true
-//            }
-//        """
-//        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(transferResponse))
-//
-//        // Act: Make API call using the mock
-//        val transfer = Transfer(sender = "12345", recipient = "56789", amount = 100.0)
-//        val response: Response<TransferBankResponse> = manageClient.fetchTransfer(transfer)
-//        val result = response.body()?.result
-//
-//        // Assert: Check if the response is successful and the status is correct
-//        assert(response.isSuccessful)
-//    }
+        // Act: Make API call using the mock
+        val response: Response<List<AccountBankResponse>> = manageClient.fetchBalance("12345")
+        val account = response.body()?.first()
+
+        // Assert: Check if the response is successful and contains the correct data
+        assert(response.isSuccessful)
+        assert(account?.balance == 1000.0)
+    }
+
+    @Test
+    fun `test fetchTransfer returns TransferBankResponse on success`() = runBlocking {
+        // Arrange: Set up MockWebServer to return a success response
+        val transferResponse = """
+            {
+                "result": true
+            }
+        """
+        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(transferResponse))
+
+        // Act: Make API call using the mock
+        val transfer = Transfer(sender = "12345", recipient = "56789", amount = 100.0)
+        val response: Response<TransferBankResponse> = manageClient.fetchTransfer(transfer)
+        val result = response.body()?.done
+
+        // Assert: Check if the response is successful and the status is correct
+        assert(response.isSuccessful)
+        assert(result == true)
+    }
 }
