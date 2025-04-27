@@ -6,6 +6,7 @@ import com.aura.ui.ConstantsApp
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.stackTracesAlignmentValueOf
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 
@@ -71,6 +72,28 @@ class LoginActivityViewModelTest {
     }
 
     @Test
-    fun reset() {
+    fun `test reset clears the UI state`() = runTest {
+        // Create the ViewModel instance
+        val cut = LoginActivityViewModel(dataRepository)
+
+        // Set some initial values in the UI state
+        cut._uiState.update {
+            it.copy(
+                isUserDataReady = true,
+                logged = true,
+                errorMessage = "Some Error"
+            )
+        }
+
+        // Call the reset() method
+        cut.reset()
+
+        // Access the UI state directly using the value property
+        val uiState = cut.uiState.value
+
+        // Assert that the UI state has been reset to null values
+        assertNull(uiState.isUserDataReady)
+        assertNull(uiState.logged)
+        assertNull(uiState.errorMessage)
     }
 }
