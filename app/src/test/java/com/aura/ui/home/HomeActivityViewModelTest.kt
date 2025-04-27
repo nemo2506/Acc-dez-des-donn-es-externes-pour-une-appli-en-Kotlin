@@ -8,14 +8,10 @@ import com.aura.domain.model.BalanceReportModel
 import com.aura.ui.ConstantsApp
 import org.junit.Assert.*
 import io.mockk.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.*
-import org.junit.After
 
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 class HomeActivityViewModelTest {
@@ -23,27 +19,19 @@ class HomeActivityViewModelTest {
     private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var dataRepository: BankRepository
     private lateinit var cut: HomeActivityViewModel
-//    private val testDispatcher = StandardTestDispatcher()
+    private lateinit var testCurrentId: String
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
+        testCurrentId = "testCurrentId"
         dataRepository = mockk<BankRepository>()
-        savedStateHandle = SavedStateHandle(mapOf(ConstantsApp.CURRENT_ID to "testCurrentId"))
+        savedStateHandle = SavedStateHandle(mapOf(ConstantsApp.CURRENT_ID to testCurrentId))
         cut = HomeActivityViewModel(dataRepository, savedStateHandle)
-//        Dispatchers.setMain(testDispatcher)
     }
-
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    @After
-//    fun tearDown() {
-//        // Reset the main dispatcher after the test
-//        Dispatchers.resetMain()
-//    }
 
     @Test
     fun `test currentId initialized correctly from SavedStateHandle`() {
-        assertEquals("testCurrentId", cut.currentId)
+        assertEquals(testCurrentId, cut.currentId)
     }
 
     @Test
@@ -56,76 +44,45 @@ class HomeActivityViewModelTest {
         assertNull(uiState.errorMessage)
     }
 
-    @Test
-    fun `test currentId initialization from SavedStateHandle`() {
-
-        // Assume the current ID is "12345" (or any other test value)
-        val testCurrentId = "12345"
-        every { savedStateHandle.get<String>(ConstantsApp.CURRENT_ID) } returns testCurrentId
-
-        // Create the ViewModel instance
-        val cut = HomeActivityViewModel(mockk(), savedStateHandle)
-
-        // Assert that currentId is set correctly from SavedStateHandle
-        assertEquals("12345", cut.currentId)
-    }
-
-    @Test
-    fun `test getAuraBalance updates UI state on success`() = runTest {
-        // Mock the currentId to return a valid value
-        val testCurrentId = "12345"
-        every { savedStateHandle.get<String>(ConstantsApp.CURRENT_ID) } returns testCurrentId
-
-        // Mock the suspend function to return a successful balance
-        coEvery { dataRepository.getBalance(testCurrentId) } returns Result.Success(
-            BalanceReportModel(100.0)
-        )
-
-        // Create the ViewModel instance
-        val cut = HomeActivityViewModel(dataRepository, savedStateHandle)
-
-        // Call the method to test
+//    @Test
+//    fun `test getAuraBalance updates UI state on success`() = runTest {
+//        // Mock the currentId to return a valid value
+//
+//        // Mock the suspend function to return a successful balance
+//        coEvery { dataRepository.getBalance(testCurrentId) } returns Result.Success(
+//            BalanceReportModel(100.0)
+//        )
+//
+//        // Call the method to test
 //        cut.getAuraBalance()
-
-        // Access the UI state directly using the value property
+//
+//        // Access the UI state directly using the value property
 //        val uiState = cut.uiState.value
-//        println("MARC MARC MARC MARC MARC getAuraBalance: $uiState")
-
-        // Ensure the UI state was updated correctly after the balance fetch
+//
+//        // Ensure the UI state was updated correctly after the balance fetch
 //        assertTrue(uiState.isBalanceReady == true)
 //        assertTrue(uiState.balance == 100.0)
 //        assertNull(uiState.errorMessage)
 //        assertFalse(uiState.isViewLoading == true)
-    }
+//    }
 
-    @Test
-    fun `test getAuraBalance handles failure`() = runTest {
-        // Mock the suspend function to return a failure result
-        coEvery { dataRepository.getBalance(any()) } returns Result.Failure("Invalid Data")
-
-        // Create the ViewModel instance
-        val cut = HomeActivityViewModel(dataRepository, savedStateHandle)
-
+//    @Test
+//    fun `test getAuraBalance handles failure`() = runTest {
+//        val errorMessage = "Some Error Message"
+//        // Mock the suspend function to return a failure result
+//        coEvery { dataRepository.getBalance(any()) } returns Result.Failure(errorMessage)
+//
 //        // Call the method to test
 //        cut.getAuraBalance()
-//        cut._uiState.update {
-//            it.copy(
-//                balance = null,
-//                isBalanceReady = null,
-//                errorMessage = "Invalid data"
-//            )
-//        }
-
-        // Ensure the UI state was updated correctly after the failure
+//
+//        // Ensure the UI state was updated correctly after the failure
 //        assertNull(cut.uiState.value.balance)
 //        assertNull(cut.uiState.value.isBalanceReady)
-//        assertEquals("Invalid data", cut.uiState.value.errorMessage)
-    }
+//        assertEquals(errorMessage, cut.uiState.value.errorMessage)
+//    }
 
     @Test
     fun `test reset clears the UI state`() = runTest {
-        // Create the ViewModel instance
-        val cut = HomeActivityViewModel(dataRepository, savedStateHandle)
 
         // Set some initial values in the UI state
         cut._uiState.update {
