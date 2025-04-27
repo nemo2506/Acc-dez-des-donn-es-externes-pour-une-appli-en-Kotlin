@@ -40,7 +40,7 @@ class HomeActivityViewModel @Inject constructor(
     /**
      * Mutable backing state for UI.
      */
-    private val _uiState = MutableStateFlow(QueryUiState())
+    val _uiState = MutableStateFlow(QueryUiState())
 
     /**
      * Public immutable state observed by the UI.

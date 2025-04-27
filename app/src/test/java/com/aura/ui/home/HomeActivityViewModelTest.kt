@@ -65,7 +65,7 @@ class HomeActivityViewModelTest {
         )
 
         // Create the ViewModel instance
-//        val cut = HomeActivityViewModel(dataRepository, savedStateHandle)
+        val cut = HomeActivityViewModel(dataRepository, savedStateHandle)
 
         // Call the method to test
 //        cut.getAuraBalance()
