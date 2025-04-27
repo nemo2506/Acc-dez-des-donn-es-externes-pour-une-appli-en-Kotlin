@@ -40,18 +40,25 @@ class BankRepositoryTest {
 
     /**
      * Verifies that [BankRepository.getLogin] returns a success result
-     * when the backend response indicates access is granted, and returns a failure
-     * when the backend responds with an error.
+     * when the backend response indicates access is granted
      */
     @Test
-    fun `assert when getLogin is requested then clean data is provided`() = runTest {
+    fun `assert when getLogin is requested then clean data is provided when result is true`() = runTest {
         // Success case
         val loginResponse = LoginBankResponse(granted = true)
         coEvery { dataService.fetchAccess(any()) } returns Response.success(loginResponse)
 
         val resultSuccess = cut.getLogin("identifier", "password")
         assertEquals(Result.Success(LoginReportModel(granted = true)), resultSuccess)
+    }
 
+    /**
+     * Verifies that [BankRepository.getLogin] returns a false result
+     * when the backend response indicates access is no-granted, and returns a failure
+     * when the backend responds with an error.
+     */
+    @Test
+    fun `assert when getLogin is requested then clean data is provided when result is false`() = runTest {
         // Error case
         coEvery {
             dataService.fetchAccess(any())
@@ -69,7 +76,7 @@ class BankRepositoryTest {
      * on success, and returns a failure when the backend responds with an error.
      */
     @Test
-    fun `assert when getBalance is requested then clean data is provided`() = runTest {
+    fun `assert when getBalance is requested then clean data is provided when result is true`() = runTest {
         // Success case
         val accountResponse = listOf(
             AccountBankResponse(id = "identifiant", main = true, balance = 100.0)
@@ -79,7 +86,14 @@ class BankRepositoryTest {
 
         val resultSuccess = cut.getBalance("identifiant")
         assertEquals(Result.Success(BalanceReportModel(100.0)), resultSuccess)
+    }
 
+    /**
+     * Verifies that [BankRepository.getBalance] returns the main account's balance
+     * on success, and returns a failure when the backend responds with an error.
+     */
+    @Test
+    fun `assert when getBalance is requested then clean data is provided when result is false`() = runTest {
         // Error case
         coEvery {
             dataService.fetchBalance(any())
@@ -97,7 +111,7 @@ class BankRepositoryTest {
      * when the transfer is completed, and returns a failure when the transfer fails.
      */
     @Test
-    fun `assert when getTransfer is requested then clean data is provided`() = runTest {
+    fun `assert when getTransfer is requested then clean data is provided when result is true`() = runTest {
         // Success case
         val transferResponse = TransferBankResponse(done = true)
 
@@ -105,7 +119,14 @@ class BankRepositoryTest {
 
         val resultSuccess = cut.getTransfer("idendifiant1", "idendifiant2", amount = 100.0)
         assertEquals(Result.Success(TransferReportModel(done = true)), resultSuccess)
+    }
 
+    /**
+     * Verifies that [BankRepository.getTransfer] returns a success result
+     * when the transfer is completed, and returns a failure when the transfer fails.
+     */
+    @Test
+    fun `assert when getTransfer is requested then clean data is provided when result is false`() = runTest {
         // Error case
         coEvery {
             dataService.fetchTransfer(any())
