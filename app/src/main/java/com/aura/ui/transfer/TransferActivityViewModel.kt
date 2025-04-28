@@ -38,8 +38,8 @@ class TransferActivityViewModel @Inject constructor(
     /**
      * StateFlow to inform the screen of the current transfer activity state.
      */
-    val _uiState = MutableStateFlow(TransferUiState())
-    val uiState: StateFlow<TransferUiState> = _uiState.asStateFlow()
+    val _uiState = MutableStateFlow(QueryUiState())
+    val uiState: StateFlow<QueryUiState> = _uiState.asStateFlow()
 
     /**
      * Updates the UI state to indicate whether the user has filled in the recipient and amount fields.
@@ -99,8 +99,7 @@ class TransferActivityViewModel @Inject constructor(
                         currentState.copy(
                             isUserDataReady = false,
                             transferred = transferUpdate.value.done,
-                            isViewLoading = false,
-                            errorMessage = null
+                            isViewLoading = false
                         )
                     }
                 }
@@ -131,7 +130,7 @@ class TransferActivityViewModel @Inject constructor(
  * - isViewLoading: Boolean indicating whether the transfer is in progress (loading state).
  * - errorMessage: A string to hold any error message if an error occurs.
  */
-data class TransferUiState(
+data class QueryUiState(
     val isUserDataReady: Boolean? = null,
     val transferred: Boolean? = null,
     val isViewLoading: Boolean? = null,
