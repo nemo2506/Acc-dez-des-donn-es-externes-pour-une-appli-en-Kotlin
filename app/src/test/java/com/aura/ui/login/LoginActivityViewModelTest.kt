@@ -1,26 +1,47 @@
 package com.aura.ui.login
 
+import app.cash.turbine.test
+import app.cash.turbine.testIn
+import app.cash.turbine.turbineScope
 import com.aura.data.repository.BankRepository
 import com.aura.data.repository.Result
 import com.aura.domain.model.LoginReportModel
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.*
 
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LoginActivityViewModelTest {
 
     private lateinit var dataRepository: BankRepository
     private lateinit var cut: LoginActivityViewModel
+    private val testDispatcher = StandardTestDispatcher() // To control coroutine execution
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(testDispatcher) // Set the main dispatcher for testing
         dataRepository = mockk()
         cut = LoginActivityViewModel(dataRepository)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain() // Reset the dispatcher after tests
     }
 
     @Test
@@ -29,7 +50,7 @@ class LoginActivityViewModelTest {
 
         assertNull(uiState.isUserDataReady)
         assertNull(uiState.logged)
-        assertFalse(uiState.isViewLoading)
+        assertNull(uiState.isViewLoading)
         assertNull(uiState.errorMessage)
     }
 
@@ -69,46 +90,68 @@ class LoginActivityViewModelTest {
         uiState.isUserDataReady?.let { assertTrue(it) }
     }
 
-//    @Test
-//    fun `test getAuraLogin success updates logged true`() = runTest {
-//        // Given
-//        val testId = "testuser"
-//        val testPassword = "testpass"
-//
-//        coEvery { dataRepository.getLogin(testId, testPassword) } returns
-//                Result.Success(LoginReportModel(granted = true))
-//
-//        // When
-//        cut.getAuraLogin(testId, testPassword)
-//
-//        // Then
-//        val uiState = cut.uiState.value
-//        assertEquals(false, uiState.isUserDataReady)
-//        assertEquals(false, uiState.isViewLoading)
-//        assertTrue(uiState.logged == true)
-//        assertNull(uiState.errorMessage)
-//    }
+    @Test
+    fun `test getAuraLogin loading`() = runTest {
+        // Given
+        val testId = "identifier"
+        val testPassword = "password"
 
-//    @Test
-//    fun `test getAuraLogin failure updates errorMessage`() = runTest {
-//        // Given
-//        val testId = "wronguser"
-//        val testPassword = "wrongpass"
-//        val errorMessage = "Invalid credentials"
-//
-//        coEvery { dataRepository.getLogin(testId, testPassword) } returns
-//                Result.Failure(errorMessage)
-//
-//        // When
-//        cut.getAuraLogin(testId, testPassword)
-//
-//        // Then
-//        val uiState = cut.uiState.value
-//        assertEquals(false, uiState.isUserDataReady)
-//        assertEquals(false, uiState.isViewLoading)
-//        assertEquals(false, uiState.logged)
-//        assertEquals(errorMessage, uiState.errorMessage)
-//    }
+        // Mocking repository response
+        coEvery { dataRepository.getLogin(testId, testPassword) } returns
+                Result.Success(LoginReportModel(granted = true))
+
+        // When
+        cut.getAuraLogin(testId, testPassword)
+
+        // Then
+        delay(500)
+        cut.uiState.test {
+            val expectedState = QueryUiState(isUserDataReady=false, logged=null, isViewLoading=true, errorMessage=null)
+            assertEquals(expectedState, awaitItem())
+        }
+    }
+
+    @Test
+    fun `test getAuraLogin success updates logged true`() = runTest {
+        // Given
+        val testId = "identifier"
+        val testPassword = "password"
+
+        // Mocking repository response
+        coEvery { dataRepository.getLogin(testId, testPassword) } returns
+                Result.Success(LoginReportModel(granted = true))
+
+        // When
+        cut.getAuraLogin(testId, testPassword)
+
+        // Then
+        delay(1100)
+        cut.uiState.test {
+            val expectedState = QueryUiState(isUserDataReady=false, logged=true, isViewLoading=false, errorMessage=null)
+            assertEquals(expectedState, awaitItem())
+        }
+    }
+
+    @Test
+    fun `test getAuraLogin failure updates errorMessage`() = runTest {
+        // Given
+        val testId = "wronguser"
+        val testPassword = "wrongpass"
+        val errorMessage = "Invalid credentials"
+
+        coEvery { dataRepository.getLogin(testId, testPassword) } returns
+                Result.Failure(errorMessage)
+
+        // When
+        cut.getAuraLogin(testId, testPassword)
+
+        // Then
+        delay(1100)
+        cut.uiState.test {
+            val expectedState = QueryUiState(isUserDataReady=false, logged=false, isViewLoading=false, errorMessage=errorMessage)
+            assertEquals(expectedState, awaitItem())
+        }
+    }
 
     @Test
     fun `test reset clears the UI state`() = runTest {
