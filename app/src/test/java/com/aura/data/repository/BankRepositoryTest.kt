@@ -25,7 +25,7 @@ import retrofit2.Response
  */
 class BankRepositoryTest {
 
-    private lateinit var cut: BankRepository // Class Under Test
+    private lateinit var cut: BankRepository
     private lateinit var dataService: ManageClient
 
     /**
@@ -48,7 +48,10 @@ class BankRepositoryTest {
         val loginResponse = LoginBankResponse(granted = true)
         coEvery { dataService.fetchAccess(any()) } returns Response.success(loginResponse)
 
+        // When
         val resultSuccess = cut.getLogin("identifier", "password")
+
+        // Then
         assertEquals(Result.Success(LoginReportModel(granted = true)), resultSuccess)
     }
 
@@ -67,7 +70,10 @@ class BankRepositoryTest {
             "Bad Request".toResponseBody("application/json".toMediaTypeOrNull())
         )
 
+        // When
         val resultFailure = cut.getLogin("identifier", "password")
+
+        // Then
         assertEquals(Result.Failure("Invalid data"), resultFailure)
     }
 
@@ -79,12 +85,15 @@ class BankRepositoryTest {
     fun `assert when getBalance is requested then clean data is provided when result is true`() = runTest {
         // Success case
         val accountResponse = listOf(
-            AccountBankResponse(id = "identifiant", main = true, balance = 100.0)
+            AccountBankResponse(id = "identified", main = true, balance = 100.0)
         )
 
         coEvery { dataService.fetchBalance(any()) } returns Response.success(accountResponse)
 
-        val resultSuccess = cut.getBalance("identifiant")
+        // When
+        val resultSuccess = cut.getBalance("identified")
+
+        // Then
         assertEquals(Result.Success(BalanceReportModel(100.0)), resultSuccess)
     }
 
@@ -102,7 +111,10 @@ class BankRepositoryTest {
             "Bad Request".toResponseBody("application/json".toMediaTypeOrNull())
         )
 
+        // When
         val resultFailure = cut.getBalance("identifiant")
+
+        // Then
         assertEquals(Result.Failure("Invalid data"), resultFailure)
     }
 
@@ -117,7 +129,10 @@ class BankRepositoryTest {
 
         coEvery { dataService.fetchTransfer(any()) } returns Response.success(transferResponse)
 
+        // When
         val resultSuccess = cut.getTransfer("idendifiant1", "idendifiant2", amount = 100.0)
+
+        // Then
         assertEquals(Result.Success(TransferReportModel(done = true)), resultSuccess)
     }
 
@@ -135,7 +150,10 @@ class BankRepositoryTest {
             "Bad Request".toResponseBody("application/json".toMediaTypeOrNull())
         )
 
+        // When
         val resultFailure = cut.getTransfer("1234", "5678", amount = 100.0)
+
+        // Then
         assertEquals(Result.Failure("Invalid data"), resultFailure)
     }
 }

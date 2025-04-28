@@ -14,10 +14,19 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.*
 import org.junit.After
-
 import org.junit.Before
 import org.junit.Test
 
+/**
+ * Unit tests for [HomeActivityViewModel].
+ *
+ * These tests validate the ViewModel's behavior in various scenarios such as:
+ * - Initialization from [SavedStateHandle]
+ * - Handling success and failure when fetching balance
+ * - Updating and resetting the UI state
+ *
+ * Coroutines are controlled using [StandardTestDispatcher] to allow deterministic testing.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeActivityViewModelTest {
 
@@ -25,99 +34,131 @@ class HomeActivityViewModelTest {
     private lateinit var dataRepository: BankRepository
     private lateinit var cut: HomeActivityViewModel
     private lateinit var testCurrentId: String
-    private val testDispatcher = StandardTestDispatcher() // To control coroutine execution
+    private val testDispatcher = StandardTestDispatcher()
 
+    /**
+     * Setup before each test.
+     * Initializes the main dispatcher for coroutine control, mocks dependencies, and creates ViewModel instance.
+     */
     @Before
     fun setup() {
-        Dispatchers.setMain(testDispatcher) // Set the main dispatcher for testing
+        Dispatchers.setMain(testDispatcher)
         testCurrentId = "testCurrentId"
-        dataRepository = mockk<BankRepository>()
+        dataRepository = mockk()
         savedStateHandle = SavedStateHandle(mapOf(ConstantsApp.CURRENT_ID to testCurrentId))
         cut = HomeActivityViewModel(dataRepository, savedStateHandle)
     }
 
+    /**
+     * Clean up after each test.
+     * Resets the main dispatcher.
+     */
     @After
     fun tearDown() {
-        Dispatchers.resetMain() // Reset the dispatcher after tests
+        Dispatchers.resetMain()
     }
 
+    /**
+     * Tests that the ViewModel's [HomeActivityViewModel.currentId] is initialized correctly
+     * from the [SavedStateHandle].
+     */
     @Test
     fun `test currentId initialized correctly from SavedStateHandle`() {
         assertEquals(testCurrentId, cut.currentId)
     }
 
+    /**
+     * Tests that the initial [QueryUiState] is correctly set to its default values (all null).
+     */
     @Test
     fun `test initial uiState is default`() = runTest {
         val uiState = cut.uiState.value
-
         assertNull(uiState.isBalanceReady)
         assertNull(uiState.balance)
         assertNull(uiState.isViewLoading)
         assertNull(uiState.errorMessage)
     }
 
+    /**
+     * Tests that the [HomeActivityViewModel.getAuraBalance] method first emits a loading state.
+     */
     @Test
     fun `test getAuraBalance loading`() = runTest {
-        // Mock the currentId to return a valid value
-
-        // Mock the suspend function to return a successful balance
         coEvery { dataRepository.getBalance(testCurrentId) } returns Result.Success(
             BalanceReportModel(100.0)
         )
 
         // When
         cut.getAuraBalance()
+        delay(500)
 
         // Then
-        delay(500)
         cut.uiState.test {
-            val expectedState = QueryUiState( isBalanceReady = null, balance = null, isViewLoading = true, errorMessage = null )
+            val expectedState = QueryUiState(
+                isBalanceReady = null,
+                balance = null,
+                isViewLoading = true,
+                errorMessage = null
+            )
             assertEquals(expectedState, awaitItem())
         }
     }
 
+    /**
+     * Tests that [HomeActivityViewModel.getAuraBalance] updates the UI state correctly on a successful balance fetch.
+     */
     @Test
     fun `test getAuraBalance updates UI state on success`() = runTest {
-        // Mock the balance to return a valid value
         val balance = 100.0
-
-        // Mock the suspend function to return a successful balance
         coEvery { dataRepository.getBalance(testCurrentId) } returns Result.Success(
-            BalanceReportModel(balance = balance)
+            BalanceReportModel(balance)
         )
 
         // When
         cut.getAuraBalance()
+        delay(1100)
 
         // Then
-        delay(1100)
         cut.uiState.test {
-            val expectedState = QueryUiState(isBalanceReady = true, balance = balance, isViewLoading=false, errorMessage=null)
+            val expectedState = QueryUiState(
+                isBalanceReady = true,
+                balance = balance,
+                isViewLoading = false,
+                errorMessage = null
+            )
             assertEquals(expectedState, awaitItem())
         }
     }
 
+    /**
+     * Tests that [HomeActivityViewModel.getAuraBalance] handles errors and updates the UI state correctly on failure.
+     */
     @Test
     fun `test getAuraBalance handles failure`() = runTest {
         val errorMessage = "Some Error Message"
-        // Mock the suspend function to return a failure result
         coEvery { dataRepository.getBalance(any()) } returns Result.Failure(errorMessage)
 
         // When
         cut.getAuraBalance()
+        delay(1100)
 
         // Then
-        delay(1100)
         cut.uiState.test {
-            val expectedState = QueryUiState(isBalanceReady = false, balance = null, isViewLoading=false, errorMessage=errorMessage)
+            val expectedState = QueryUiState(
+                isBalanceReady = false,
+                balance = null,
+                isViewLoading = false,
+                errorMessage = errorMessage
+            )
             assertEquals(expectedState, awaitItem())
         }
     }
 
+    /**
+     * Tests that the [HomeActivityViewModel.reset] function clears the current [QueryUiState] to default values.
+     */
     @Test
     fun `test reset clears the UI state`() = runTest {
-
-        // Set some initial values in the UI state
         cut._uiState.update {
             it.copy(
                 balance = 1000.0,
@@ -126,13 +167,11 @@ class HomeActivityViewModelTest {
             )
         }
 
-        // Call the reset() method
+        // When
         cut.reset()
-
-        // Access the UI state directly using the value property
         val uiState = cut.uiState.value
 
-        // Assert that the UI state has been reset to null values
+        // Then
         assertNull(uiState.balance)
         assertNull(uiState.isBalanceReady)
         assertNull(uiState.errorMessage)

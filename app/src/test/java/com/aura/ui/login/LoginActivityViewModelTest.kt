@@ -21,10 +21,14 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.*
-
 import org.junit.Before
 import org.junit.Test
 
+/**
+ * Unit tests for the [LoginActivityViewModel] class, ensuring that its methods
+ * and behavior work correctly under various scenarios. This includes testing the UI state
+ * changes, interaction with the repository, and handling of different login outcomes.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginActivityViewModelTest {
 
@@ -32,6 +36,10 @@ class LoginActivityViewModelTest {
     private lateinit var cut: LoginActivityViewModel
     private val testDispatcher = StandardTestDispatcher() // To control coroutine execution
 
+    /**
+     * Set up the test environment, initializing the required components like
+     * the repository and the view model. This method is executed before each test.
+     */
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher) // Set the main dispatcher for testing
@@ -39,57 +47,103 @@ class LoginActivityViewModelTest {
         cut = LoginActivityViewModel(dataRepository)
     }
 
+    /**
+     * Reset the dispatcher after tests to ensure no state leaks between tests.
+     */
     @After
     fun tearDown() {
         Dispatchers.resetMain() // Reset the dispatcher after tests
     }
 
+    /**
+     * Test to verify that the initial UI state of the [LoginActivityViewModel] is
+     * correctly set to default values.
+     */
     @Test
     fun `test initial uiState is default`() = runTest {
+        // When
         val uiState = cut.uiState.value
 
+        // Then
         assertNull(uiState.isUserDataReady)
         assertNull(uiState.logged)
         assertNull(uiState.isViewLoading)
         assertNull(uiState.errorMessage)
     }
 
+    /**
+     * Test the [userDataControl] method when both the identifier and password are empty.
+     * This should set [isUserDataReady] to false.
+     */
     @Test
     fun `test userDataControl with empty identifier and empty password`() = runTest {
         val identifier = ""
         val password = ""
+
+        // When
         cut.userDataControl(identifier.isNotEmpty(), password.isNotEmpty())
         val uiState = cut.uiState.value
+
+        // Then
         uiState.isUserDataReady?.let { assertFalse(it) }
     }
 
+    /**
+     * Test the [userDataControl] method when the identifier is valid but the password is empty.
+     * This should set [isUserDataReady] to false.
+     */
     @Test
     fun `test userDataControl with existed identifier and empty password`() = runTest {
         val identifier = "i"
         val password = ""
+
+        // When
         cut.userDataControl(identifier.isNotEmpty(), password.isNotEmpty())
         val uiState = cut.uiState.value
+
+        // Then
         uiState.isUserDataReady?.let { assertFalse(it) }
     }
 
+    /**
+     * Test the [userDataControl] method when the identifier is empty but the password is valid.
+     * This should set [isUserDataReady] to false.
+     */
     @Test
     fun `test userDataControl with empty identifier and existed password`() = runTest {
         val identifier = ""
         val password = "p"
+
+        // When
         cut.userDataControl(identifier.isNotEmpty(), password.isNotEmpty())
         val uiState = cut.uiState.value
+
+
+        // Then
         uiState.isUserDataReady?.let { assertFalse(it) }
     }
 
+    /**
+     * Test the [userDataControl] method when both the identifier and password are valid.
+     * This should set [isUserDataReady] to true.
+     */
     @Test
     fun `test userDataControl with existed identifier and existed password`() = runTest {
         val identifier = "i"
         val password = "p"
+
+        // When
         cut.userDataControl(identifier.isNotEmpty(), password.isNotEmpty())
         val uiState = cut.uiState.value
+
+        // Then
         uiState.isUserDataReady?.let { assertTrue(it) }
     }
 
+    /**
+     * Test the behavior of [getAuraLogin] when the login is loading. This ensures the
+     * UI state is updated to reflect that the login request is in progress.
+     */
     @Test
     fun `test getAuraLogin loading`() = runTest {
         // Given
@@ -102,15 +156,19 @@ class LoginActivityViewModelTest {
 
         // When
         cut.getAuraLogin(testId, testPassword)
+        delay(500)
 
         // Then
-        delay(500)
         cut.uiState.test {
             val expectedState = QueryUiState(isUserDataReady=false, logged=null, isViewLoading=true, errorMessage=null)
             assertEquals(expectedState, awaitItem())
         }
     }
 
+    /**
+     * Test the behavior of [getAuraLogin] when the login is successful. This ensures the
+     * UI state is updated to reflect the successful login and sets [logged] to true.
+     */
     @Test
     fun `test getAuraLogin success updates logged true`() = runTest {
         // Given
@@ -123,15 +181,19 @@ class LoginActivityViewModelTest {
 
         // When
         cut.getAuraLogin(testId, testPassword)
+        delay(1100)
 
         // Then
-        delay(1100)
         cut.uiState.test {
             val expectedState = QueryUiState(isUserDataReady=false, logged=true, isViewLoading=false, errorMessage=null)
             assertEquals(expectedState, awaitItem())
         }
     }
 
+    /**
+     * Test the behavior of [getAuraLogin] when the login fails. This ensures the
+     * UI state is updated to reflect the error and sets [errorMessage] accordingly.
+     */
     @Test
     fun `test getAuraLogin failure updates errorMessage`() = runTest {
         // Given
@@ -144,15 +206,19 @@ class LoginActivityViewModelTest {
 
         // When
         cut.getAuraLogin(testId, testPassword)
+        delay(1100)
 
         // Then
-        delay(1100)
         cut.uiState.test {
             val expectedState = QueryUiState(isUserDataReady=false, logged=false, isViewLoading=false, errorMessage=errorMessage)
             assertEquals(expectedState, awaitItem())
         }
     }
 
+    /**
+     * Test the [reset] method to verify that the UI state is cleared correctly.
+     * This resets values like [isUserDataReady], [logged], and [errorMessage].
+     */
     @Test
     fun `test reset clears the UI state`() = runTest {
         // Set some initial values in the UI state
@@ -164,13 +230,11 @@ class LoginActivityViewModelTest {
             )
         }
 
-        // Call the reset() method
+        // When
         cut.reset()
-
-        // Access the UI state directly using the value property
         val uiState = cut.uiState.value
 
-        // Assert that the UI state has been reset to null values
+        // Then
         assertNull(uiState.isUserDataReady)
         assertNull(uiState.logged)
         assertNull(uiState.errorMessage)

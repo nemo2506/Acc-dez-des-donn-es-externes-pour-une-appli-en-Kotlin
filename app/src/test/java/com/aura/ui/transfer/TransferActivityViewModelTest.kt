@@ -19,10 +19,14 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.*
-
 import org.junit.Before
 import org.junit.Test
 
+/**
+ * Unit tests for the [TransferActivityViewModel] class, which is responsible for handling
+ * transfer-related actions and updating the UI state accordingly. This includes testing the
+ * various methods and scenarios for initiating a transfer and managing UI state updates.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class TransferActivityViewModelTest {
 
@@ -31,6 +35,10 @@ class TransferActivityViewModelTest {
     private lateinit var cut: TransferActivityViewModel
     private val testDispatcher = StandardTestDispatcher() // To control coroutine execution
 
+    /**
+     * Sets up the necessary components for testing, such as the repository, SavedStateHandle,
+     * and the ViewModel instance. This method is called before each test is executed.
+     */
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher) // Set the main dispatcher for testing
@@ -39,16 +47,25 @@ class TransferActivityViewModelTest {
         cut = TransferActivityViewModel(dataRepository, savedStateHandle)
     }
 
+    /**
+     * Resets the dispatcher after tests to ensure that no state is carried over between tests.
+     */
     @After
     fun tearDown() {
         Dispatchers.resetMain() // Reset the dispatcher after tests
     }
 
+    /**
+     * Test to ensure that the [currentId] is correctly initialized from the [SavedStateHandle].
+     */
     @Test
     fun `test currentId initialized correctly from SavedStateHandle`() {
         assertEquals("testCurrentId", cut.currentId)
     }
 
+    /**
+     * Test to verify that the initial UI state in the ViewModel is set to default values.
+     */
     @Test
     fun `test initial uiState is default`() {
         val uiState = cut.uiState.value
@@ -59,43 +76,79 @@ class TransferActivityViewModelTest {
         assertNull(uiState.errorMessage)
     }
 
-
+    /**
+     * Test the behavior of [userDataControl] when both recipient and amount are empty.
+     * It ensures that the UI state [isUserDataReady] is set to false.
+     */
     @Test
     fun `test userDataControl with empty recipient and empty amount`() = runTest {
         val recipient = ""
         val amount = ""
+
+        // When
         cut.userDataControl(recipient.isNotEmpty(), amount.isNotEmpty())
         val uiState = cut.uiState.value
+
+        // Then
         uiState.isUserDataReady?.let { assertFalse(it) }
     }
 
+    /**
+     * Test the behavior of [userDataControl] when the recipient is provided but the amount is empty.
+     * It ensures that the UI state [isUserDataReady] is set to false.
+     */
     @Test
     fun `test userDataControl with existed recipient and empty amount`() = runTest {
         val recipient = "r"
         val amount = ""
+
+        // When
         cut.userDataControl(recipient.isNotEmpty(), amount.isNotEmpty())
         val uiState = cut.uiState.value
+
+
+        // Then
         uiState.isUserDataReady?.let { assertFalse(it) }
     }
 
+    /**
+     * Test the behavior of [userDataControl] when the recipient is empty but the amount is provided.
+     * It ensures that the UI state [isUserDataReady] is set to false.
+     */
     @Test
     fun `test userDataControl with empty recipient and existed amount`() = runTest {
         val recipient = ""
         val amount = "0.0"
+
+        // When
         cut.userDataControl(recipient.isNotEmpty(), amount.isNotEmpty())
         val uiState = cut.uiState.value
+
+        // Then
         uiState.isUserDataReady?.let { assertFalse(it) }
     }
 
+    /**
+     * Test the behavior of [userDataControl] when both the recipient and amount are provided.
+     * It ensures that the UI state [isUserDataReady] is set to true.
+     */
     @Test
     fun `test userDataControl with existed recipient and existed amount`() = runTest {
         val recipient = "r"
         val amount = "0.0"
+
+        // When
         cut.userDataControl(recipient.isNotEmpty(), amount.isNotEmpty())
         val uiState = cut.uiState.value
+
+        // Then
         uiState.isUserDataReady?.let { assertTrue(it) }
     }
 
+    /**
+     * Test the behavior of [getAuraTransfer] when the transfer is loading. It ensures that the
+     * UI state is updated to reflect that the transfer is in progress (view loading state).
+     */
     @Test
     fun `test getAuraTransfer loading`() = runTest {
         // Arrange
@@ -106,15 +159,19 @@ class TransferActivityViewModelTest {
 
         // When
         cut.getAuraTransfer(recipient, amount)
+        delay(500)
 
         // Then
-        delay(500)
         cut.uiState.test {
             val expectedState = QueryUiState( isUserDataReady = false, transferred = null, isViewLoading = true, errorMessage = null )
             assertEquals(expectedState, awaitItem())
         }
     }
 
+    /**
+     * Test the behavior of [getAuraTransfer] when the transfer is successful. It ensures that the
+     * UI state is updated to indicate that the transfer was successful (transferred = true).
+     */
     @Test
     fun `test getAuraTransfer success updates transferred true`() = runTest {
         // Arrange
@@ -125,15 +182,19 @@ class TransferActivityViewModelTest {
 
         // When
         cut.getAuraTransfer(recipient, amount)
+        delay(1100)
 
         // Then
-        delay(1100)
         cut.uiState.test {
             val expectedState = QueryUiState(isUserDataReady = false, transferred = true, isViewLoading = false, errorMessage = null)
             assertEquals(expectedState, awaitItem())
         }
     }
 
+    /**
+     * Test the behavior of [getAuraTransfer] when the transfer fails. It ensures that the
+     * UI state is updated to reflect the error message when the transfer is unsuccessful.
+     */
     @Test
     fun `test getAuraTransfer failure updates errorMessage`() = runTest {
         // Arrange
@@ -145,16 +206,19 @@ class TransferActivityViewModelTest {
 
         // When
         cut.getAuraTransfer(recipient, amount)
-
+        delay(1100)
 
         // Then
-        delay(1100)
         cut.uiState.test {
             val expectedState = QueryUiState(isUserDataReady = false, transferred = false, isViewLoading = false, errorMessage = errorMessage)
             assertEquals(expectedState, awaitItem())
         }
     }
 
+    /**
+     * Test the [reset] method to ensure that the UI state is cleared correctly, resetting values
+     * like [transferred] and [errorMessage] to null.
+     */
     @Test
     fun `test reset clears the UI state`() = runTest {
         // Set some initial values in the UI state

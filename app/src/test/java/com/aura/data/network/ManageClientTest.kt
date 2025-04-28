@@ -9,189 +9,196 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import retrofit2.Response
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.junit.Assert.*
 
+/**
+ * Unit tests for [ManageClient] network calls.
+ *
+ * Tests are using [MockWebServer] to mock API responses and verify
+ * the behavior of network calls made through Retrofit.
+ */
 class ManageClientTest {
 
     private lateinit var mockWebServer: MockWebServer
     private lateinit var manageClient: ManageClient
 
+    /**
+     * Sets up the test environment before each test:
+     * - Initializes a [MockWebServer].
+     * - Configures a [Retrofit] instance pointing to the MockWebServer.
+     */
     @Before
     fun setUp() {
-        // Initialize MockWebServer
         mockWebServer = MockWebServer()
 
-        // Set up Retrofit with the MockWebServer URL
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val retrofit = Retrofit.Builder()
-            .baseUrl(mockWebServer.url("/"))  // Use the MockWebServer URL
+            .baseUrl(mockWebServer.url("/"))
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
 
-        // Create ManageClient instance
         manageClient = retrofit.create(ManageClient::class.java)
     }
 
+    /**
+     * Shuts down the [MockWebServer] after each test.
+     */
     @After
     fun tearDown() {
-        // Shut down MockWebServer after test
         mockWebServer.shutdown()
     }
 
+    /**
+     * Verifies that [fetchAccess] returns a successful [LoginBankResponse]
+     * when the API responds with a granted=true response.
+     */
     @Test
     fun `test fetchAccess returns LoginBankResponse on success`() = runBlocking {
-        // Arrange: Set up MockWebServer to return a success response
-        val loginResponse = """
-            {
-                "granted": true
-            }
-        """
+        val loginResponse = """ { "granted": true } """
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(loginResponse))
 
-        // Act: Make API call using the mock
         val user = User(id = "12345", password = "password")
-        val response: Response<LoginBankResponse> = manageClient.fetchAccess(user)
+        val response = manageClient.fetchAccess(user)
         val logged = response.body()?.granted
 
-        // Assert: Check if the response is successful and the token is returned
         assert(response.isSuccessful)
         assert(logged == true)
     }
 
+    /**
+     * Verifies that [fetchAccess] returns a successful [LoginBankResponse]
+     * with granted=false when the API denies access.
+     */
     @Test
     fun `test fetchAccess returns LoginBankResponse on failed`() = runBlocking {
-        // Arrange: Set up MockWebServer to return a success response
-        val loginResponse = """
-            {
-                "granted": false
-            }
-        """
+        val loginResponse = """ { "granted": false } """
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(loginResponse))
 
-        // Act: Make API call using the mock
         val user = User(id = "12345", password = "password")
-        val response: Response<LoginBankResponse> = manageClient.fetchAccess(user)
+        val response = manageClient.fetchAccess(user)
         val logged = response.body()?.granted
 
-        // Assert: Check if the response is successful and the token is returned
         assert(response.isSuccessful)
         assertFalse(logged == true)
     }
 
+    /**
+     * Verifies that [fetchAccess] handles a 500 Internal Server Error properly.
+     */
+    @Test
+    fun `test fetchAccess returns failure on 500 internal server error`() = runBlocking {
+        val errorResponse = """ { "error": "Internal Server Error" } """
+        mockWebServer.enqueue(MockResponse().setResponseCode(500).setBody(errorResponse))
+
+        val user = User(id = "12345", password = "password")
+        val response = manageClient.fetchAccess(user)
+        val errorBody = response.errorBody()?.string()
+
+        assert(!response.isSuccessful)
+        assertTrue(errorBody?.contains("Internal Server Error") == true)
+    }
+
+    /**
+     * Verifies that [fetchBalance] returns a successful [AccountBankResponse]
+     * when the API returns valid account data.
+     */
     @Test
     fun `test fetchBalance returns AccountBankResponse on success`() = runBlocking {
-        // Arrange: Set up MockWebServer to return a success response
-        val balanceResponse = """
-            [
-                {
-                    "id": "1",
-                    "main": true,
-                    "balance": 1000.0
-                }
-            ]
-        """
+        val balanceResponse = """ [ { "id": "1", "main": true, "balance": 1000.0 } ] """
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(balanceResponse))
 
-        // Act: Make API call using the mock
-        val response: Response<List<AccountBankResponse>> = manageClient.fetchBalance("12345")
+        val response = manageClient.fetchBalance("12345")
         val account = response.body()?.first()
 
-        // Assert: Check if the response is successful and contains the correct data
         assert(response.isSuccessful)
         assert(account?.balance == 1000.0)
     }
 
+    /**
+     * Verifies that [fetchBalance] returns an empty list when no accounts are found.
+     */
     @Test
-    fun `test fetchBalance returns empty list when no accounts found`() = runBlocking {
-        // Arrange: Set up MockWebServer to return a success response with an empty list
-        val balanceResponse = """
-        []
-    """
+    fun `test fetchBalance returns AccountBankResponse when no accounts found`() = runBlocking {
+        val balanceResponse = """ [] """
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(balanceResponse))
 
-        // Act: Make API call using the mock
-        val response: Response<List<AccountBankResponse>> = manageClient.fetchBalance("12345")
-
-        // Assert: Check if the response is successful and contains an empty list
+        val response = manageClient.fetchBalance("12345")
         val accountList = response.body()
-        // Additional assert: if we want to make sure no accounts are present
         val account = accountList?.firstOrNull()
 
         assert(response.isSuccessful)
         assertNotNull(accountList)
-        if (accountList != null) {
-            assertTrue(accountList.isEmpty())
-        }
-        assertNull(account)  // Should be null since the list is empty
+        if (accountList != null) assertTrue(accountList.isEmpty())
+        assertNull(account)
     }
 
+    /**
+     * Verifies that [fetchBalance] handles a 500 Internal Server Error properly.
+     */
+    @Test
+    fun `test fetchBalance returns failure on 500 internal server error`() = runBlocking {
+        val errorResponse = """ { "error": "Internal Server Error" } """
+        mockWebServer.enqueue(MockResponse().setResponseCode(500).setBody(errorResponse))
+
+        val response = manageClient.fetchBalance("12345")
+        val errorBody = response.errorBody()?.string()
+
+        assert(!response.isSuccessful)
+        assertTrue(errorBody?.contains("Internal Server Error") == true)
+    }
+
+    /**
+     * Verifies that [fetchTransfer] returns a successful [TransferBankResponse]
+     * when the transfer is completed successfully.
+     */
     @Test
     fun `test fetchTransfer returns TransferBankResponse on success`() = runBlocking {
-        // Arrange: Set up MockWebServer to return a success response
-        val transferResponse = """
-            {
-                "result": true
-            }
-        """
+        val transferResponse = """ { "result": true } """
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(transferResponse))
 
-        // Act: Make API call using the mock
         val transfer = Transfer(sender = "12345", recipient = "56789", amount = 100.0)
-        val response: Response<TransferBankResponse> = manageClient.fetchTransfer(transfer)
+        val response = manageClient.fetchTransfer(transfer)
         val result = response.body()?.done
 
-        // Assert: Check if the response is successful and the status is correct
         assert(response.isSuccessful)
         assert(result == true)
     }
 
+    /**
+     * Verifies that [fetchTransfer] returns a [TransferBankResponse]
+     * indicating failure when the transfer is not completed.
+     */
     @Test
     fun `test fetchTransfer returns TransferBankResponse on failed`() = runBlocking {
-        // Arrange: Set up MockWebServer to return a success response
-        val transferResponse = """
-            {
-                "result": false
-            }
-        """
+        val transferResponse = """ { "result": false } """
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(transferResponse))
 
-        // Act: Make API call using the mock
         val transfer = Transfer(sender = "12345", recipient = "56789", amount = 100.0)
-        val response: Response<TransferBankResponse> = manageClient.fetchTransfer(transfer)
+        val response = manageClient.fetchTransfer(transfer)
         val result = response.body()?.done
 
-        // Assert: Check if the response is successful and the status is correct
         assert(response.isSuccessful)
         assert(result == false)
     }
 
+    /**
+     * Verifies that [fetchTransfer] handles a 500 Internal Server Error properly.
+     */
     @Test
     fun `test fetchTransfer returns failure on 500 internal server error`() = runBlocking {
-        // Arrange: Set up MockWebServer to return a 500 Internal Server Error response
-        val errorResponse = """
-        {
-            "error": "Internal Server Error"
-        }
-    """
+        val errorResponse = """ { "error": "Internal Server Error" } """
         mockWebServer.enqueue(MockResponse().setResponseCode(500).setBody(errorResponse))
 
-        // Act: Make API call using the mock
         val transfer = Transfer(sender = "12345", recipient = "56789", amount = 100.0)
-        val response: Response<TransferBankResponse> = manageClient.fetchTransfer(transfer)
-        // Optionally: You can check if the error body contains the expected error message
+        val response = manageClient.fetchTransfer(transfer)
         val errorBody = response.errorBody()?.string()
 
-        // Assert: Check if the response is not successful due to the 500 error
         assert(!response.isSuccessful)
         assertTrue(errorBody?.contains("Internal Server Error") == true)
     }
