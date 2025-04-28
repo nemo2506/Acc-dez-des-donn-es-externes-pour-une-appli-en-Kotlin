@@ -3,6 +3,7 @@ package com.aura.ui.home
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -78,9 +79,10 @@ class HomeActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState.collect {
 
+                Log.d("MARC MARC", "onCreate: $it")
                 // Control UI loading and retry states
                 loading.isVisible = it.isViewLoading == true
-                retry.isVisible = it.balance == null && it.isViewLoading == false
+                retry.isVisible = it.isBalanceReady == false
 
                 // Show balance if available
                 if (it.isBalanceReady == true) {
@@ -93,6 +95,7 @@ class HomeActivity : AppCompatActivity() {
                     viewModel.reset()
                     toastMessage(getString(R.string.balance_failed))
                 }
+
             }
         }
     }

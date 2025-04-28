@@ -168,7 +168,6 @@ class HomeActivityViewModelTest {
 
         // Then
         assertNull(uiState.balance)
-        assertNull(uiState.isBalanceReady)
         assertNull(uiState.isViewLoading)
         assertNull(uiState.errorMessage)
     }

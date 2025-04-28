@@ -105,7 +105,6 @@ class HomeActivityViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 balance = null,
-                isBalanceReady = null,
                 isViewLoading = null,
                 errorMessage = null
             )
