@@ -94,13 +94,11 @@ class HomeActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val expectedState = QueryUiState(
-                isBalanceReady = null,
-                balance = null,
-                isViewLoading = true,
-                errorMessage = null
-            )
-            assertEquals(expectedState, awaitItem())
+            val uiStateTest = awaitItem()
+            assertEquals(null, uiStateTest.isBalanceReady)
+            assertEquals(null, uiStateTest.balance)
+            assertEquals(true, uiStateTest.isViewLoading)
+            assertEquals(null, uiStateTest.errorMessage)
         }
     }
 
@@ -120,13 +118,11 @@ class HomeActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val expectedState = QueryUiState(
-                isBalanceReady = true,
-                balance = balance,
-                isViewLoading = false,
-                errorMessage = null
-            )
-            assertEquals(expectedState, awaitItem())
+            val uiStateTest = awaitItem()
+            assertEquals(true, uiStateTest.isBalanceReady)
+            assertEquals(balance, uiStateTest.balance)
+            assertEquals(false, uiStateTest.isViewLoading)
+            assertEquals(null, uiStateTest.errorMessage)
         }
     }
 
@@ -134,7 +130,7 @@ class HomeActivityViewModelTest {
      * Tests that [HomeActivityViewModel.getAuraBalance] handles errors and updates the UI state correctly on failure.
      */
     @Test
-    fun `test getAuraBalance handles failure`() = runTest {
+    fun `test getAuraBalance failure updates errorMessage`() = runTest {
         val errorMessage = "Some Error Message"
         coEvery { dataRepository.getBalance(any()) } returns Result.Failure(errorMessage)
 
@@ -144,13 +140,11 @@ class HomeActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val expectedState = QueryUiState(
-                isBalanceReady = false,
-                balance = null,
-                isViewLoading = false,
-                errorMessage = errorMessage
-            )
-            assertEquals(expectedState, awaitItem())
+            val uiStateTest = awaitItem()
+            assertEquals(false, uiStateTest.isBalanceReady)
+            assertEquals(null, uiStateTest.balance)
+            assertEquals(false, uiStateTest.isViewLoading)
+            assertEquals(errorMessage, uiStateTest.errorMessage)
         }
     }
 
@@ -163,6 +157,7 @@ class HomeActivityViewModelTest {
             it.copy(
                 balance = 1000.0,
                 isBalanceReady = true,
+                isViewLoading = true,
                 errorMessage = "Some error"
             )
         }
@@ -174,6 +169,7 @@ class HomeActivityViewModelTest {
         // Then
         assertNull(uiState.balance)
         assertNull(uiState.isBalanceReady)
+        assertNull(uiState.isViewLoading)
         assertNull(uiState.errorMessage)
     }
 }

@@ -162,8 +162,11 @@ class TransferActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val expectedState = QueryUiState( isUserDataReady = false, transferred = null, isViewLoading = true, errorMessage = null )
-            assertEquals(expectedState, awaitItem())
+            val uiStateTest = awaitItem()
+            assertEquals(false, uiStateTest.isUserDataReady)
+            assertEquals(null, uiStateTest.transferred)
+            assertEquals(true, uiStateTest.isViewLoading)
+            assertEquals(null, uiStateTest.errorMessage)
         }
     }
 
@@ -172,7 +175,7 @@ class TransferActivityViewModelTest {
      * UI state is updated to indicate that the transfer was successful (transferred = true).
      */
     @Test
-    fun `test getAuraTransfer success updates transferred true`() = runTest {
+    fun `test getAuraTransfer updates UI state on success`() = runTest {
         // Arrange
         val recipient = "56789"
         val amount = 50.0
@@ -185,8 +188,11 @@ class TransferActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val expectedState = QueryUiState(isUserDataReady = false, transferred = true, isViewLoading = false, errorMessage = null)
-            assertEquals(expectedState, awaitItem())
+            val uiStateTest = awaitItem()
+            assertEquals(false, uiStateTest.isUserDataReady)
+            assertEquals(true, uiStateTest.transferred)
+            assertEquals(false, uiStateTest.isViewLoading)
+            assertEquals(null, uiStateTest.errorMessage)
         }
     }
 
@@ -209,8 +215,11 @@ class TransferActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val expectedState = QueryUiState(isUserDataReady = false, transferred = false, isViewLoading = false, errorMessage = errorMessage)
-            assertEquals(expectedState, awaitItem())
+            val uiStateTest = awaitItem()
+            assertEquals(false, uiStateTest.isUserDataReady)
+            assertEquals(false, uiStateTest.transferred)
+            assertEquals(false, uiStateTest.isViewLoading)
+            assertEquals(errorMessage, uiStateTest.errorMessage)
         }
     }
 
@@ -224,6 +233,8 @@ class TransferActivityViewModelTest {
         cut._uiState.update {
             it.copy(
                 transferred = true,
+                isViewLoading = true,
+                isUserDataReady = true,
                 errorMessage = "Some Error"
             )
         }
@@ -236,6 +247,8 @@ class TransferActivityViewModelTest {
 
         // Assert that the UI state has been reset to null values
         assertNull(uiState.transferred)
+        assertNull(uiState.isViewLoading)
+        assertNull(uiState.isUserDataReady)
         assertNull(uiState.errorMessage)
     }
 }
