@@ -110,6 +110,7 @@ class LoginActivityViewModel @Inject constructor(
             currentState.copy(
                 isUserDataReady = null,
                 logged = null,
+                isViewLoading = null,
                 errorMessage = null
             )
         }
@@ -126,6 +127,6 @@ class LoginActivityViewModel @Inject constructor(
 data class QueryUiState(
     val isUserDataReady: Boolean? = null,
     val logged: Boolean? = null,
-    val isViewLoading: Boolean = false,
+    val isViewLoading: Boolean? = null,
     val errorMessage: String? = null
 )

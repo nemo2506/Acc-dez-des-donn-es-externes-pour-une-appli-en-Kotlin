@@ -80,7 +80,7 @@ class HomeActivity : AppCompatActivity() {
 
                 // Control UI loading and retry states
                 loading.isVisible = it.isViewLoading == true
-                retry.isVisible = it.balance == null
+                retry.isVisible = it.balance == null && it.isViewLoading == false
 
                 // Show balance if available
                 if (it.isBalanceReady == true) {

@@ -63,11 +63,12 @@ class LoginActivity : AppCompatActivity() {
          */
         lifecycleScope.launch {
             viewModel.uiState.collect {
-
+                println("UI State: $it")
                 // Show or hide the loading indicator
                 loading.isVisible = it.isViewLoading == true
-                // Enable login button based on loader state or data readiness
-                login.isEnabled = it.isViewLoading == false && it.isUserDataReady == true
+                // Enable login button based on loader state
+                login.isEnabled = it.isUserDataReady == true
+
 
                 // Navigate to HomeActivity if login is successful
                 if (it.logged == true) {
