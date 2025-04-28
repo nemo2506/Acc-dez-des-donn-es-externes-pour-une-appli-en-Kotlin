@@ -194,6 +194,7 @@ class LoginActivityViewModelTest {
      * Test the behavior of [getAuraLogin] when the login fails. This ensures the
      * UI state is updated to reflect the error and sets [errorMessage] accordingly.
      */
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test getAuraLogin failure updates errorMessage`() = runTest {
         // Given
