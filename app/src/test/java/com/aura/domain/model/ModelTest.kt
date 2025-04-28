@@ -2,6 +2,7 @@ package com.aura.domain.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -9,6 +10,17 @@ import org.junit.Test
  * Unit tests for model classes in the com.aura.domain.model package.
  */
 class ModelTest {
+    /**
+     * Tests [LoginReportModel] with a null value.
+     */
+    @Test
+    fun `LoginReportModel granted should be null when not provided`() {
+        // When
+        val loginReport = LoginReportModel(granted = null)
+        // Then
+        assertNull(loginReport.granted)
+    }
+
 
     /**
      * Tests that [LoginReportModel] correctly stores the granted property.
@@ -33,6 +45,17 @@ class ModelTest {
     }
 
     /**
+     * Tests [BalanceReportModel] with a null balance value.
+     */
+    @Test
+    fun `BalanceReportModel balance should be null when not provided`() {
+        // When
+        val balanceReport = BalanceReportModel(balance = null)
+        // Then
+        assertNull(balanceReport.balance)
+    }
+
+    /**
      * Tests that [TransferReportModel] correctly stores the done property.
      */
     @Test
@@ -41,6 +64,17 @@ class ModelTest {
         val transferReport = TransferReportModel(done = false)
         // Then
         assertFalse(transferReport.done!!)
+    }
+
+    /**
+     * Tests [TransferReportModel] with a null done value.
+     */
+    @Test
+    fun `TransferReportModel done should be null when not provided`() {
+        // When
+        val transferReport = TransferReportModel(done = null)
+        // Then
+        assertNull(transferReport.done)
     }
 
     /**
