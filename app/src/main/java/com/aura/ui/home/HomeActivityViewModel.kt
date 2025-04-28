@@ -89,8 +89,7 @@ class HomeActivityViewModel @Inject constructor(
                         currentState.copy(
                             isBalanceReady = true,
                             balance = balanceUpdate.value.balance,
-                            isViewLoading = false,
-                            errorMessage = null
+                            isViewLoading = false
                         )
                     }
                 }

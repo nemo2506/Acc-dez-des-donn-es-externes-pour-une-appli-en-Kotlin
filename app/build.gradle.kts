@@ -78,6 +78,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.9")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0-RC2")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
+    testImplementation("app.cash.turbine:turbine:1.2.0")
 }
 
 kapt {

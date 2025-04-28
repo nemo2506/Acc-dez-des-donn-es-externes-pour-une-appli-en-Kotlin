@@ -71,7 +71,8 @@ class LoginActivityViewModel @Inject constructor(
             delay(1000)
 
             // Attempt to log in and update UI state based on the result
-            when (val loginUpdate: Result<LoginReportModel> = dataRepository.getLogin(currentId, password)) {
+            when (val loginUpdate: Result<LoginReportModel> =
+                dataRepository.getLogin(currentId, password)) {
 
                 // If login fails, update state with failure message
                 is Result.Failure -> {
