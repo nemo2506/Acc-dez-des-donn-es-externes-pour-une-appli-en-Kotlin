@@ -73,7 +73,7 @@ class TransferActivity : AppCompatActivity() {
                 // Show loading indicator and disable transfer button while loading
                 loading.isVisible = it.isViewLoading == true
                 // Enable transfer button based on loader state or data readiness
-                transfer.isEnabled = it.isViewLoading == false && it.isUserDataReady == true
+                transfer.isEnabled = it.isUserDataReady == true
 
                 // If the transfer is successful, navigate to HomeActivity
                 if (it.transferred == true) {

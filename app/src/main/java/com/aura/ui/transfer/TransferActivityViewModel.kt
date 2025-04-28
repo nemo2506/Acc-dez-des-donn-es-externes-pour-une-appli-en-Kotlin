@@ -69,6 +69,7 @@ class TransferActivityViewModel @Inject constructor(
             // Simulate a delay before showing the loader
             _uiState.update { currentState ->
                 currentState.copy(
+                    isUserDataReady = false,
                     isViewLoading = true,
                     errorMessage = null
                 )
@@ -84,6 +85,7 @@ class TransferActivityViewModel @Inject constructor(
                 is Result.Failure -> {
                     _uiState.update { currentState ->
                         currentState.copy(
+                            isUserDataReady = false,
                             isViewLoading = false,
                             errorMessage = transferUpdate.message,
                             transferred = false
@@ -112,7 +114,9 @@ class TransferActivityViewModel @Inject constructor(
     fun reset() {
         _uiState.update { currentState ->
             currentState.copy(
+                isUserDataReady = null,
                 transferred = null,
+                isViewLoading = null,
                 errorMessage = null
             )
         }
@@ -130,6 +134,6 @@ class TransferActivityViewModel @Inject constructor(
 data class TransferUiState(
     val isUserDataReady: Boolean? = null,
     val transferred: Boolean? = null,
-    val isViewLoading: Boolean = false,
+    val isViewLoading: Boolean? = null,
     val errorMessage: String? = null
 )
