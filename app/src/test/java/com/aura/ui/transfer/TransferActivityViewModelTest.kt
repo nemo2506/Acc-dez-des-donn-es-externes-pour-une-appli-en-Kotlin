@@ -1,6 +1,5 @@
 package com.aura.ui.transfer
 
-import com.aura.ui.transfer.QueryUiState
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.aura.data.repository.BankRepository

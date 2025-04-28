@@ -1,8 +1,6 @@
 package com.aura.ui.login
 
 import app.cash.turbine.test
-import app.cash.turbine.testIn
-import app.cash.turbine.turbineScope
 import com.aura.data.repository.BankRepository
 import com.aura.data.repository.Result
 import com.aura.domain.model.LoginReportModel
@@ -11,9 +9,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
