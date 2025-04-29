@@ -60,6 +60,7 @@ class HomeActivity : AppCompatActivity() {
         val loading = binding.loading
         val transfer = binding.transfer
         val retry = binding.retry
+
         viewModel.reset()
         // Trigger balance fetch initially and on retry button click
         viewModel.getAuraBalance()
@@ -80,7 +81,6 @@ class HomeActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState.collect {
 
-                Log.d("MARC MARC", "onCreate: $it")
                 // Control UI loading and retry states
                 loading.isVisible = it.isViewLoading == true
                 retry.isVisible = it.errorMessage != null && it.balance == null
