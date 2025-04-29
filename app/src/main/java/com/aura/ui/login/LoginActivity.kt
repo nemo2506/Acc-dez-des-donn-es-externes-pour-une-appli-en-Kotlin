@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -51,10 +52,12 @@ class LoginActivity : AppCompatActivity() {
         identifier.addTextChangedListener(textWatcher)
         password.addTextChangedListener(textWatcher)
 
+        viewModel.reset()
         /**
          * Login button triggers login process through the ViewModel.
          */
         login.setOnClickListener {
+            viewModel.reset()
             viewModel.getAuraLogin(identifier.text.toString(), password.text.toString())
         }
 
@@ -63,7 +66,8 @@ class LoginActivity : AppCompatActivity() {
          */
         lifecycleScope.launch {
             viewModel.uiState.collect {
-                println("UI State: $it")
+
+                Log.d("MARC MARC", "onCreate: $it")
                 // Show or hide the loading indicator
                 loading.isVisible = it.isViewLoading == true
                 // Enable login button based on loader state
@@ -76,15 +80,9 @@ class LoginActivity : AppCompatActivity() {
                     toastMessage(getString(R.string.login_success))
                 }
 
-                // Show error and reset state on login failure
-                if (it.logged == false) {
-                    viewModel.reset()
-                    toastMessage(getString(R.string.login_failed))
-                }
-
                 // Show a generic error message if present
-                if (it.errorMessage?.isNotBlank() == true) {
-                    toastMessage(it.errorMessage)
+                if (it.errorMessage != null || it.logged == false) {
+                    toastMessage(getString(R.string.login_failed))
                 }
             }
         }

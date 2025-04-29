@@ -43,7 +43,9 @@ class LoginActivityViewModel @Inject constructor(
     fun userDataControl(identifier: Boolean, password: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
-                isUserDataReady = identifier && password
+                isUserDataReady = identifier && password,
+                errorMessage = null,
+                logged = null
             )
         }
     }
@@ -92,8 +94,7 @@ class LoginActivityViewModel @Inject constructor(
                         currentState.copy(
                             isUserDataReady = false,
                             logged = loginUpdate.value.granted,
-                            isViewLoading = false,
-                            errorMessage = null
+                            isViewLoading = false
                         )
                     }
                 }
