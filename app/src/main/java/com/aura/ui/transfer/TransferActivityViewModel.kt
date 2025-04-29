@@ -50,7 +50,9 @@ class TransferActivityViewModel @Inject constructor(
     fun userDataControl(isRecipient: Boolean, isAmount: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(
-                isUserDataReady = isRecipient && isAmount
+                isUserDataReady = isRecipient && isAmount,
+                errorMessage = null,
+                transferred = null
             )
         }
     }

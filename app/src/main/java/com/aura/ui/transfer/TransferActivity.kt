@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -55,8 +56,10 @@ class TransferActivity : AppCompatActivity() {
         recipient.addTextChangedListener(textWatcher)
         amount.addTextChangedListener(textWatcher)
 
+        viewModel.reset()
         // Handle the transfer button click to initiate the transfer process
         transfer.setOnClickListener {
+            viewModel.reset()
             // Call ViewModel method to handle transfer logic
             viewModel.getAuraTransfer(
                 recipient.text.toString(),
@@ -69,6 +72,7 @@ class TransferActivity : AppCompatActivity() {
 
             viewModel.uiState.collect {
 
+                Log.d("MARC MARC", "onCreate: $it")
                 // Show loading indicator and disable transfer button while loading
                 loading.isVisible = it.isViewLoading == true
                 // Enable transfer button based on loader state or data readiness
@@ -80,15 +84,9 @@ class TransferActivity : AppCompatActivity() {
                     toastMessage(getString(R.string.transfer_success))
                 }
 
-                // If the transfer fails, reset ViewModel state and show error message
-                if (it.transferred == false) {
-                    viewModel.reset()
-                    toastMessage(getString(R.string.transfer_failed))
-                }
-
                 // Display any error message if available
-                if (it.errorMessage?.isNotBlank() == true)
-                    toastMessage(it.errorMessage)
+                if (it.errorMessage != null && it.transferred == false)
+                    toastMessage(getString(R.string.transfer_failed))
             }
         }
 
