@@ -89,8 +89,7 @@ class TransferActivityViewModel @Inject constructor(
                         currentState.copy(
                             isUserDataReady = false,
                             isViewLoading = false,
-                            errorMessage = transferUpdate.message,
-                            transferred = false
+                            errorMessage = transferUpdate.message
                         )
                     }
                 }

@@ -84,12 +84,11 @@ class TransferActivity : AppCompatActivity() {
                     toastMessage(getString(R.string.transfer_success))
                 }
 
-                // Display any error message if available
-                if (it.errorMessage != null && it.transferred == false)
+                // Display any error message if available and if transfer failed
+                if (it.errorMessage != null || it.transferred == false)
                     toastMessage(getString(R.string.transfer_failed))
             }
         }
-
     }
 
     /**
