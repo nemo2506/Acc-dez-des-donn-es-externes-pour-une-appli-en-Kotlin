@@ -79,9 +79,12 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 // Show a generic error message if present
-                if (it.errorMessage != null || it.logged == false) {
+                if (it.logged == false)
                     toastMessage(getString(R.string.login_failed))
-                }
+
+                // Show a generic error message if present
+                if (it.errorMessage != null)
+                    toastMessage(it.errorMessage)
             }
         }
     }
