@@ -18,6 +18,6 @@
     <string name="balance_success">Solde</string>
     <string name="balance_failed">Solde indisponible</string>
     <string name="transfer_success">Transfert réussi</string>
-    <string name="transfer_failed">Destinataire ou Montant invalide</string>
+    <string name="transfer_failed">Montant invalide</string>
     <string name="server_required">Service Aura indisponible</string>
 </resources>
