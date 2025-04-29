@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -67,7 +66,6 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState.collect {
 
-                Log.d("MARC MARC", "onCreate: $it")
                 // Show or hide the loading indicator
                 loading.isVisible = it.isViewLoading == true
                 // Enable login button based on loader state
