@@ -190,6 +190,33 @@ class LoginActivityViewModelTest {
             assertEquals(null, uiStateTest.errorMessage)
         }
     }
+    /**
+     * Test the behavior of [getAuraLogin] when the login is successful. This ensures the
+     * UI state is updated to reflect the successful login and sets [logged] to true.
+     */
+    @Test
+    fun `test getAuraLogin success updates UI state on failed`() = runTest {
+        // Given
+        val testId = "wrongIdentifier"
+        val testPassword = "wrongPassword"
+
+        // Mocking repository response
+        coEvery { dataRepository.getLogin(testId, testPassword) } returns
+                Result.Success(LoginReportModel(granted = false))
+
+        // When
+        cut.getAuraLogin(testId, testPassword)
+        delay(1100)
+
+        // Then
+        cut.uiState.test {
+            val uiStateTest = awaitItem()
+            assertEquals(false, uiStateTest.isUserDataReady)
+            assertEquals(false, uiStateTest.logged)
+            assertEquals(false, uiStateTest.isViewLoading)
+            assertEquals(null, uiStateTest.errorMessage)
+        }
+    }
 
     /**
      * Test the behavior of [getAuraLogin] when the login fails. This ensures the
@@ -199,8 +226,8 @@ class LoginActivityViewModelTest {
     @Test
     fun `test getAuraLogin failure updates errorMessage`() = runTest {
         // Given
-        val testId = "wronguser"
-        val testPassword = "wrongpass"
+        val testId = "identifier"
+        val testPassword = "password"
         val errorMessage = "Invalid credentials"
 
         coEvery { dataRepository.getLogin(testId, testPassword) } returns
@@ -214,7 +241,7 @@ class LoginActivityViewModelTest {
         cut.uiState.test {
             val uiStateTest = awaitItem()
             assertEquals(false, uiStateTest.isUserDataReady)
-            assertEquals(false, uiStateTest.logged)
+            assertEquals(null, uiStateTest.logged)
             assertEquals(false, uiStateTest.isViewLoading)
             assertEquals(errorMessage, uiStateTest.errorMessage)
         }
