@@ -93,10 +93,10 @@ class HomeActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(null, uiStateTest.balance)
-            assertEquals(true, uiStateTest.isViewLoading)
-            assertEquals(null, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(null, uiStateReady.balance)
+            assertEquals(true, uiStateReady.isViewLoading)
+            assertEquals(null, uiStateReady.errorMessage)
         }
     }
 
@@ -116,10 +116,10 @@ class HomeActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(balance, uiStateTest.balance)
-            assertEquals(false, uiStateTest.isViewLoading)
-            assertEquals(null, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(balance, uiStateReady.balance)
+            assertEquals(false, uiStateReady.isViewLoading)
+            assertEquals(null, uiStateReady.errorMessage)
         }
     }
 
@@ -137,10 +137,10 @@ class HomeActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(null, uiStateTest.balance)
-            assertEquals(false, uiStateTest.isViewLoading)
-            assertEquals(errorMessage, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(null, uiStateReady.balance)
+            assertEquals(false, uiStateReady.isViewLoading)
+            assertEquals(errorMessage, uiStateReady.errorMessage)
         }
     }
 

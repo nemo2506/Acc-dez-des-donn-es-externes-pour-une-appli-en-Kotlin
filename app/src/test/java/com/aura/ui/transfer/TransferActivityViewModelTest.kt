@@ -162,11 +162,11 @@ class TransferActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(false, uiStateTest.isUserDataReady)
-            assertEquals(null, uiStateTest.transferred)
-            assertEquals(true, uiStateTest.isViewLoading)
-            assertEquals(null, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(false, uiStateReady.isUserDataReady)
+            assertEquals(null, uiStateReady.transferred)
+            assertEquals(true, uiStateReady.isViewLoading)
+            assertEquals(null, uiStateReady.errorMessage)
         }
     }
 
@@ -188,11 +188,36 @@ class TransferActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(false, uiStateTest.isUserDataReady)
-            assertEquals(true, uiStateTest.transferred)
-            assertEquals(false, uiStateTest.isViewLoading)
-            assertEquals(null, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(false, uiStateReady.isUserDataReady)
+            assertEquals(true, uiStateReady.transferred)
+            assertEquals(false, uiStateReady.isViewLoading)
+            assertEquals(null, uiStateReady.errorMessage)
+        }
+    }
+    /**
+     * Test the behavior of [getAuraTransfer] when the transfer is successful with done failed. It ensures that the
+     * UI state is updated to indicate that the transfer was successful (transferred = false).
+     */
+    @Test
+    fun `test getAuraTransfer updates UI state on failed`() = runTest {
+        // Arrange
+        val recipient = "5678"
+        val amount = 10000000.00
+        coEvery { dataRepository.getTransfer("testCurrentId", recipient, amount) } returns
+                Result.Success(TransferReportModel(done = false))
+
+        // When
+        cut.getAuraTransfer(recipient, amount)
+        delay(1100)
+
+        // Then
+        cut.uiState.test {
+            val uiStateReady = awaitItem()
+            assertEquals(false, uiStateReady.isUserDataReady)
+            assertEquals(false, uiStateReady.transferred)
+            assertEquals(false, uiStateReady.isViewLoading)
+            assertEquals(null, uiStateReady.errorMessage)
         }
     }
 
@@ -215,11 +240,11 @@ class TransferActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(false, uiStateTest.isUserDataReady)
-            assertEquals(false, uiStateTest.transferred)
-            assertEquals(false, uiStateTest.isViewLoading)
-            assertEquals(errorMessage, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(false, uiStateReady.isUserDataReady)
+            assertEquals(null, uiStateReady.transferred)
+            assertEquals(false, uiStateReady.isViewLoading)
+            assertEquals(errorMessage, uiStateReady.errorMessage)
         }
     }
 

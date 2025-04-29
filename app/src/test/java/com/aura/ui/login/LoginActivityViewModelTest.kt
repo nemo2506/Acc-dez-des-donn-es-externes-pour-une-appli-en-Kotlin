@@ -155,11 +155,11 @@ class LoginActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(false, uiStateTest.isUserDataReady)
-            assertEquals(null, uiStateTest.logged)
-            assertEquals(true, uiStateTest.isViewLoading)
-            assertEquals(null, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(false, uiStateReady.isUserDataReady)
+            assertEquals(null, uiStateReady.logged)
+            assertEquals(true, uiStateReady.isViewLoading)
+            assertEquals(null, uiStateReady.errorMessage)
         }
     }
 
@@ -183,16 +183,16 @@ class LoginActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(false, uiStateTest.isUserDataReady)
-            assertEquals(true, uiStateTest.logged)
-            assertEquals(false, uiStateTest.isViewLoading)
-            assertEquals(null, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(false, uiStateReady.isUserDataReady)
+            assertEquals(true, uiStateReady.logged)
+            assertEquals(false, uiStateReady.isViewLoading)
+            assertEquals(null, uiStateReady.errorMessage)
         }
     }
     /**
-     * Test the behavior of [getAuraLogin] when the login is successful. This ensures the
-     * UI state is updated to reflect the successful login and sets [logged] to true.
+     * Test the behavior of [getAuraLogin] when the login is successful with granted false. This ensures the
+     * UI state is updated to reflect the successful login and sets [logged] to false.
      */
     @Test
     fun `test getAuraLogin success updates UI state on failed`() = runTest {
@@ -210,11 +210,11 @@ class LoginActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(false, uiStateTest.isUserDataReady)
-            assertEquals(false, uiStateTest.logged)
-            assertEquals(false, uiStateTest.isViewLoading)
-            assertEquals(null, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(false, uiStateReady.isUserDataReady)
+            assertEquals(false, uiStateReady.logged)
+            assertEquals(false, uiStateReady.isViewLoading)
+            assertEquals(null, uiStateReady.errorMessage)
         }
     }
 
@@ -239,11 +239,11 @@ class LoginActivityViewModelTest {
 
         // Then
         cut.uiState.test {
-            val uiStateTest = awaitItem()
-            assertEquals(false, uiStateTest.isUserDataReady)
-            assertEquals(null, uiStateTest.logged)
-            assertEquals(false, uiStateTest.isViewLoading)
-            assertEquals(errorMessage, uiStateTest.errorMessage)
+            val uiStateReady = awaitItem()
+            assertEquals(false, uiStateReady.isUserDataReady)
+            assertEquals(null, uiStateReady.logged)
+            assertEquals(false, uiStateReady.isViewLoading)
+            assertEquals(errorMessage, uiStateReady.errorMessage)
         }
     }
 
