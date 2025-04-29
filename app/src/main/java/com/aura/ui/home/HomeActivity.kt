@@ -60,10 +60,11 @@ class HomeActivity : AppCompatActivity() {
         val loading = binding.loading
         val transfer = binding.transfer
         val retry = binding.retry
-
+        viewModel.reset()
         // Trigger balance fetch initially and on retry button click
         viewModel.getAuraBalance()
         retry.setOnClickListener {
+            viewModel.reset()
             viewModel.getAuraBalance()
         }
 
@@ -82,20 +83,18 @@ class HomeActivity : AppCompatActivity() {
                 Log.d("MARC MARC", "onCreate: $it")
                 // Control UI loading and retry states
                 loading.isVisible = it.isViewLoading == true
-                retry.isVisible = it.isBalanceReady == false
+                retry.isVisible = it.errorMessage != null && it.balance == null
 
                 // Show balance if available
-                if (it.isBalanceReady == true) {
+                if (it.errorMessage == null && it.balance != null) {
                     balance.text = "%.2f€".format(it.balance)
                     toastMessage(getString(R.string.balance_success))
                 }
 
                 // Reset state if balance fetch fails
-                if (it.isBalanceReady == false) {
-                    viewModel.reset()
+                if (it.errorMessage != null) {
                     toastMessage(getString(R.string.balance_failed))
                 }
-
             }
         }
     }

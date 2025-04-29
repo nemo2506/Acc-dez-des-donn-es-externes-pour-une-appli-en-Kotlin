@@ -73,7 +73,6 @@ class HomeActivityViewModelTest {
     @Test
     fun `test initial uiState is default`() = runTest {
         val uiState = cut.uiState.value
-        assertNull(uiState.isBalanceReady)
         assertNull(uiState.balance)
         assertNull(uiState.isViewLoading)
         assertNull(uiState.errorMessage)
@@ -95,7 +94,6 @@ class HomeActivityViewModelTest {
         // Then
         cut.uiState.test {
             val uiStateTest = awaitItem()
-            assertEquals(null, uiStateTest.isBalanceReady)
             assertEquals(null, uiStateTest.balance)
             assertEquals(true, uiStateTest.isViewLoading)
             assertEquals(null, uiStateTest.errorMessage)
@@ -119,7 +117,6 @@ class HomeActivityViewModelTest {
         // Then
         cut.uiState.test {
             val uiStateTest = awaitItem()
-            assertEquals(true, uiStateTest.isBalanceReady)
             assertEquals(balance, uiStateTest.balance)
             assertEquals(false, uiStateTest.isViewLoading)
             assertEquals(null, uiStateTest.errorMessage)
@@ -141,7 +138,6 @@ class HomeActivityViewModelTest {
         // Then
         cut.uiState.test {
             val uiStateTest = awaitItem()
-            assertEquals(false, uiStateTest.isBalanceReady)
             assertEquals(null, uiStateTest.balance)
             assertEquals(false, uiStateTest.isViewLoading)
             assertEquals(errorMessage, uiStateTest.errorMessage)
@@ -156,7 +152,6 @@ class HomeActivityViewModelTest {
         cut._uiState.update {
             it.copy(
                 balance = 1000.0,
-                isBalanceReady = true,
                 isViewLoading = true,
                 errorMessage = "Some error"
             )
