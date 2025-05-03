@@ -43,7 +43,7 @@ class TransferActivityViewModelTest {
         Dispatchers.setMain(testDispatcher) // Set the main dispatcher for testing
         dataRepository = mockk()
         savedStateHandle = SavedStateHandle(mapOf(ConstantsApp.CURRENT_ID to "testCurrentId"))
-        cut = TransferActivityViewModel(dataRepository, savedStateHandle)
+        cut = TransferActivityViewModel(dataRepository, testDispatcher, savedStateHandle)
     }
 
     /**

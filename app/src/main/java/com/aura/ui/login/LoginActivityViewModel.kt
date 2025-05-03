@@ -6,6 +6,7 @@ import com.aura.data.repository.BankRepository
 import com.aura.data.repository.Result
 import com.aura.domain.model.LoginReportModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * ViewModel responsible for handling the login logic of the user.
@@ -22,7 +24,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class LoginActivityViewModel @Inject constructor(
-    private val dataRepository: BankRepository
+    private val dataRepository: BankRepository,
+    @Named("IO") private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     /**
@@ -59,7 +62,7 @@ class LoginActivityViewModel @Inject constructor(
      */
     fun getAuraLogin(currentId: String, password: String) {
 
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
 
             // Simulate a delay before showing the loader
             _uiState.update { currentState ->

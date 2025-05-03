@@ -39,7 +39,7 @@ class LoginActivityViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher) // Set the main dispatcher for testing
         dataRepository = mockk()
-        cut = LoginActivityViewModel(dataRepository)
+        cut = LoginActivityViewModel(dataRepository,testDispatcher)
     }
 
     /**

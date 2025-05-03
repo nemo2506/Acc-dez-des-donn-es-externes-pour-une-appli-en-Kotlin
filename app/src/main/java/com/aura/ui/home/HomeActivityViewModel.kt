@@ -7,13 +7,16 @@ import com.aura.data.repository.BankRepository
 import com.aura.data.repository.Result
 import com.aura.ui.ConstantsApp
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * ViewModel for [HomeActivity], handles logic related to fetching and managing balance data.
@@ -23,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository,
+    @Named("IO") private val ioDispatcher: CoroutineDispatcher,
     appState: SavedStateHandle
 ) : ViewModel() {
 
@@ -55,7 +59,7 @@ class HomeActivityViewModel @Inject constructor(
      */
     fun getAuraBalance() {
 
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
 
             // Simulate a delay before showing the loader
             _uiState.update { currentState ->

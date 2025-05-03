@@ -46,7 +46,7 @@ class HomeActivityViewModelTest {
         testCurrentId = "testCurrentId"
         dataRepository = mockk()
         savedStateHandle = SavedStateHandle(mapOf(ConstantsApp.CURRENT_ID to testCurrentId))
-        cut = HomeActivityViewModel(dataRepository, savedStateHandle)
+        cut = HomeActivityViewModel(dataRepository, testDispatcher, savedStateHandle)
     }
 
     /**
@@ -89,7 +89,7 @@ class HomeActivityViewModelTest {
 
         // When
         cut.getAuraBalance()
-        delay(500)
+        delay(100)
 
         // Then
         cut.uiState.test {
