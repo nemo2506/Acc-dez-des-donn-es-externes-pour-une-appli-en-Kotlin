@@ -39,7 +39,7 @@ class LoginActivityViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher) // Set the main dispatcher for testing
         dataRepository = mockk()
-        cut = LoginActivityViewModel(dataRepository,testDispatcher)
+        cut = LoginActivityViewModel(dataRepository)
     }
 
     /**
@@ -149,13 +149,14 @@ class LoginActivityViewModelTest {
         coEvery { dataRepository.getLogin(testId, testPassword) } returns
                 Result.Success(LoginReportModel(granted = true))
 
-        // When
-        cut.getAuraLogin(testId, testPassword)
-        delay(500)
-
-        // Then
         cut.uiState.test {
+
+            awaitItem()
+            // When
+            cut.getAuraLogin(testId, testPassword)
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(false, uiStateReady.isUserDataReady)
             assertEquals(null, uiStateReady.logged)
             assertEquals(true, uiStateReady.isViewLoading)
@@ -177,19 +178,23 @@ class LoginActivityViewModelTest {
         coEvery { dataRepository.getLogin(testId, testPassword) } returns
                 Result.Success(LoginReportModel(granted = true))
 
-        // When
-        cut.getAuraLogin(testId, testPassword)
-        delay(1100)
 
         // Then
         cut.uiState.test {
+            awaitItem()
+            // When
+            cut.getAuraLogin(testId, testPassword)
+            awaitItem()
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(false, uiStateReady.isUserDataReady)
             assertEquals(true, uiStateReady.logged)
             assertEquals(false, uiStateReady.isViewLoading)
             assertEquals(null, uiStateReady.errorMessage)
         }
     }
+
     /**
      * Test the behavior of [getAuraLogin] when the login is successful with granted false. This ensures the
      * UI state is updated to reflect the successful login and sets [logged] to false.
@@ -204,13 +209,16 @@ class LoginActivityViewModelTest {
         coEvery { dataRepository.getLogin(testId, testPassword) } returns
                 Result.Success(LoginReportModel(granted = false))
 
-        // When
-        cut.getAuraLogin(testId, testPassword)
-        delay(1100)
 
-        // Then
         cut.uiState.test {
+            awaitItem()
+
+            // When
+            cut.getAuraLogin(testId, testPassword)
+            awaitItem()
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(false, uiStateReady.isUserDataReady)
             assertEquals(false, uiStateReady.logged)
             assertEquals(false, uiStateReady.isViewLoading)
@@ -233,13 +241,16 @@ class LoginActivityViewModelTest {
         coEvery { dataRepository.getLogin(testId, testPassword) } returns
                 Result.Failure(errorMessage)
 
-        // When
-        cut.getAuraLogin(testId, testPassword)
-        delay(1100)
 
-        // Then
         cut.uiState.test {
+            awaitItem()
+
+            // When
+            cut.getAuraLogin(testId, testPassword)
+            awaitItem()
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(false, uiStateReady.isUserDataReady)
             assertEquals(null, uiStateReady.logged)
             assertEquals(false, uiStateReady.isViewLoading)

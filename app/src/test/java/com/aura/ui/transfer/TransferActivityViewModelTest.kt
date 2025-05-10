@@ -43,7 +43,7 @@ class TransferActivityViewModelTest {
         Dispatchers.setMain(testDispatcher) // Set the main dispatcher for testing
         dataRepository = mockk()
         savedStateHandle = SavedStateHandle(mapOf(ConstantsApp.CURRENT_ID to "testCurrentId"))
-        cut = TransferActivityViewModel(dataRepository, testDispatcher, savedStateHandle)
+        cut = TransferActivityViewModel(dataRepository, savedStateHandle)
     }
 
     /**
@@ -156,13 +156,17 @@ class TransferActivityViewModelTest {
         coEvery { dataRepository.getTransfer("testCurrentId", recipient, amount) } returns
                 Result.Success(TransferReportModel(done = true))
 
-        // When
-        cut.getAuraTransfer(recipient, amount)
         delay(500)
 
-        // Then
+
         cut.uiState.test {
+            awaitItem()
+
+            // When
+            cut.getAuraTransfer(recipient, amount)
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(false, uiStateReady.isUserDataReady)
             assertEquals(null, uiStateReady.transferred)
             assertEquals(true, uiStateReady.isViewLoading)
@@ -182,12 +186,15 @@ class TransferActivityViewModelTest {
         coEvery { dataRepository.getTransfer("testCurrentId", recipient, amount) } returns
                 Result.Success(TransferReportModel(done = true))
 
-        // When
-        cut.getAuraTransfer(recipient, amount)
         delay(1100)
 
         // Then
         cut.uiState.test {
+            awaitItem()
+
+            // When
+            cut.getAuraTransfer(recipient, amount)
+            awaitItem()
             val uiStateReady = awaitItem()
             assertEquals(false, uiStateReady.isUserDataReady)
             assertEquals(true, uiStateReady.transferred)
@@ -195,6 +202,7 @@ class TransferActivityViewModelTest {
             assertEquals(null, uiStateReady.errorMessage)
         }
     }
+
     /**
      * Test the behavior of [getAuraTransfer] when the transfer is successful with done failed. It ensures that the
      * UI state is updated to indicate that the transfer was successful (transferred = false).
@@ -207,13 +215,15 @@ class TransferActivityViewModelTest {
         coEvery { dataRepository.getTransfer("testCurrentId", recipient, amount) } returns
                 Result.Success(TransferReportModel(done = false))
 
-        // When
-        cut.getAuraTransfer(recipient, amount)
-        delay(1100)
-
-        // Then
         cut.uiState.test {
+            awaitItem()
+
+            // When
+            cut.getAuraTransfer(recipient, amount)
+            awaitItem()
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(false, uiStateReady.isUserDataReady)
             assertEquals(false, uiStateReady.transferred)
             assertEquals(false, uiStateReady.isViewLoading)
@@ -234,13 +244,18 @@ class TransferActivityViewModelTest {
         coEvery { dataRepository.getTransfer("testCurrentId", recipient, amount) } returns
                 Result.Failure(errorMessage)
 
-        // When
-        cut.getAuraTransfer(recipient, amount)
         delay(1100)
 
-        // Then
+
         cut.uiState.test {
+            awaitItem()
+
+            // When
+            cut.getAuraTransfer(recipient, amount)
+            awaitItem()
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(false, uiStateReady.isUserDataReady)
             assertEquals(null, uiStateReady.transferred)
             assertEquals(false, uiStateReady.isViewLoading)

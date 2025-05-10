@@ -46,7 +46,7 @@ class HomeActivityViewModelTest {
         testCurrentId = "testCurrentId"
         dataRepository = mockk()
         savedStateHandle = SavedStateHandle(mapOf(ConstantsApp.CURRENT_ID to testCurrentId))
-        cut = HomeActivityViewModel(dataRepository, testDispatcher, savedStateHandle)
+        cut = HomeActivityViewModel(dataRepository, savedStateHandle)
     }
 
     /**
@@ -87,13 +87,16 @@ class HomeActivityViewModelTest {
             BalanceReportModel(100.0)
         )
 
-        // When
-        cut.getAuraBalance()
-        delay(100)
 
-        // Then
+
         cut.uiState.test {
+            awaitItem()
+
+            // When
+            cut.getAuraBalance()
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(null, uiStateReady.balance)
             assertEquals(true, uiStateReady.isViewLoading)
             assertEquals(null, uiStateReady.errorMessage)
@@ -110,13 +113,17 @@ class HomeActivityViewModelTest {
             BalanceReportModel(balance)
         )
 
-        // When
-        cut.getAuraBalance()
-        delay(1100)
 
-        // Then
+
         cut.uiState.test {
+            awaitItem()
+
+            // When
+            cut.getAuraBalance()
+            awaitItem()
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(balance, uiStateReady.balance)
             assertEquals(false, uiStateReady.isViewLoading)
             assertEquals(null, uiStateReady.errorMessage)
@@ -131,13 +138,16 @@ class HomeActivityViewModelTest {
         val errorMessage = "Some Error Message"
         coEvery { dataRepository.getBalance(any()) } returns Result.Failure(errorMessage)
 
-        // When
-        cut.getAuraBalance()
-        delay(1100)
-
         // Then
         cut.uiState.test {
+            awaitItem()
+
+            // When
+            cut.getAuraBalance()
+            awaitItem()
             val uiStateReady = awaitItem()
+
+            // Then
             assertEquals(null, uiStateReady.balance)
             assertEquals(false, uiStateReady.isViewLoading)
             assertEquals(errorMessage, uiStateReady.errorMessage)

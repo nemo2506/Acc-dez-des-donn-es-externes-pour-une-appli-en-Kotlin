@@ -25,7 +25,6 @@ import javax.inject.Named
 @HiltViewModel
 class LoginActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository,
-    @Named("IO") private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     /**
@@ -62,8 +61,7 @@ class LoginActivityViewModel @Inject constructor(
      */
     fun getAuraLogin(currentId: String, password: String) {
 
-        viewModelScope.launch(ioDispatcher) {
-
+        viewModelScope.launch() {
             // Simulate a delay before showing the loader
             _uiState.update { currentState ->
                 currentState.copy(

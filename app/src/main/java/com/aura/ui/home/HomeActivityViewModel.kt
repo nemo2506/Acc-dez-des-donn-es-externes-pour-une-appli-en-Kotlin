@@ -26,7 +26,6 @@ import javax.inject.Named
 @HiltViewModel
 class HomeActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository,
-    @Named("IO") private val ioDispatcher: CoroutineDispatcher,
     appState: SavedStateHandle
 ) : ViewModel() {
 
@@ -59,7 +58,7 @@ class HomeActivityViewModel @Inject constructor(
      */
     fun getAuraBalance() {
 
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch() {
 
             // Simulate a delay before showing the loader
             _uiState.update { currentState ->

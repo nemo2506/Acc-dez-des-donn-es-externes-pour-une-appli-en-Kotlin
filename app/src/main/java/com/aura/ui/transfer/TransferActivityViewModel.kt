@@ -24,7 +24,6 @@ import javax.inject.Named
 @HiltViewModel
 class TransferActivityViewModel @Inject constructor(
     private val dataRepository: BankRepository,
-    @Named("IO") private val ioDispatcher: CoroutineDispatcher,
     appState: SavedStateHandle
 ) : ViewModel() {
 
@@ -69,7 +68,7 @@ class TransferActivityViewModel @Inject constructor(
      */
     fun getAuraTransfer(recipient: String, amount: Double) {
 
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch() {
 
             // Simulate a delay before showing the loader
             _uiState.update { currentState ->
